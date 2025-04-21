@@ -1,0 +1,53 @@
+
+/* cajas de texto*/
+TextField {
+    -fx-font-size: 14px; 
+    -fx-padding: 10px; 
+    -fx-border-radius: 10px; 
+    -fx-background-radius: 10px; 
+    -fx-background-color: white;
+    -fx-border-color:black;
+}
+
+PasswordField {
+    -fx-font-size: 14px; 
+    -fx-padding: 10px; 
+    -fx-border-radius: 10px; 
+    -fx-background-radius: 10px; 
+    -fx-background-color: white;
+    -fx-border-color:black;
+}
+
+/* botones */
+Button{
+    -fx-background-color: #2fe976;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-padding: 10px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgb(255, 255, 255), 3, 0.8, 0, 0);
+}
+
+/* boton cuando el raton esta encima*/
+Button:hover{
+    -fx-background-color: #187c3f;
+}
+
+
+/* textos */
+#text{
+    -fx-fill: black;
+    -fx-effect: dropshadow(gaussian, white, 5, 0.8, 0, 0);
+}
+
+
+/* Texto error*/
+#error{
+    -fx-fill: red;
+    -fx-effect: dropshadow(gaussian, rgb(250, 109, 109), 3, 0.8, 0, 0);
+}
+
+#box {
+    -fx-background-color:white;
+}

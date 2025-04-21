@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="es.ies.puerto.controller.JugarController">
+    <VBox spacing="10" alignment="TOP_CENTER">
+        <HBox spacing="20" alignment="CENTER">
+            <Label fx:id="timeLabel" text="Tiempo: 0s"/>
+            <Label fx:id="movesLabel" text="Movimientos: 0"/>
+        </HBox>
+        <GridPane fx:id="grid" hgap="10" vgap="10" alignment="CENTER"/>
+    </VBox>
+</StackPane>
