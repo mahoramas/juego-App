@@ -20,8 +20,24 @@ PasswordField {
 
 /* botones */
 Button{
-    -fx-background-color: #2fe976;
+    -fx-background-color: #d61a13;
     -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-padding: 10px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgb(0, 0, 0), 3, 0.8, 0, 0);
+}
+
+/* boton cuando el raton esta encima*/
+Button:hover{
+    -fx-background-color: #830b07;
+}
+
+
+#facilButton{
+    -fx-background-color: #2fe976;
+    -fx-text-fill: rgb(0, 0, 0);
     -fx-font-size: 16px;
     -fx-padding: 10px;
     -fx-border-radius: 10px;
@@ -29,9 +45,35 @@ Button{
     -fx-effect: dropshadow(gaussian, rgb(255, 255, 255), 3, 0.8, 0, 0);
 }
 
-/* boton cuando el raton esta encima*/
-Button:hover{
+#facilButton:hover{
     -fx-background-color: #187c3f;
+}
+
+#normalButton{
+    -fx-background-color: #f9fd15;
+    -fx-text-fill: rgb(0, 0, 0);
+    -fx-font-size: 16px;
+    -fx-padding: 10px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgb(255, 255, 255), 3, 0.8, 0, 0);
+}
+
+#normalButton:hover{
+    -fx-background-color: #a2a50d;
+}
+
+#dificilButton{
+    -fx-background-color: #fd1515;
+    -fx-text-fill: rgb(0, 0, 0);
+    -fx-font-size: 16px;
+    -fx-padding: 10px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgb(255, 255, 255), 3, 0.8, 0, 0);
+}
+#dificilButton:hover{
+    -fx-background-color: #8d0909;
 }
 
 
@@ -51,3 +93,13 @@ Button:hover{
 #box {
     -fx-background-color:white;
 }
+
+
+VBox {
+    -fx-background-color:
+        linear-gradient(to bottom right, rgba(10, 127, 63, 1) 0%, rgba(8, 100, 50, 1) 100%),
+        linear-gradient(to top left, rgba(255, 255, 255, 0.02) 50%, transparent 50%);
+    -fx-background-insets: 0, 0;
+    -fx-background-blend-mode: overlay, multiply;
+}
+
