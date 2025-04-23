@@ -40,7 +40,7 @@ public class JugarController {
     private boolean isProcessing = false;
 
     private boolean contrareloj = false;
-    private int tiempoLimite = 60;
+    private int tiempoLimite = 75;
     private List<Card> allCards = new ArrayList<>();
 
     public void inicializarJuego(){
@@ -140,7 +140,7 @@ public class JugarController {
                 }
             } else {
                 SoundPlayer.play("fail.mp3", 0.1, 0.7);
-                PauseTransition wait = new PauseTransition(Duration.seconds(1));
+                PauseTransition wait = new PauseTransition(Duration.seconds(0.8));
                 wait.setOnFinished(ev -> {
                     selected1.flip();
                     selected2.flip();
