@@ -11,9 +11,11 @@ public class UsuarioEntity {
     private int victoriasFacil;
     private int victoriasNormal;
     private int victoriasDificil;
-    private Integer mejorTiempoNormal; // Puede ser null
+    private Integer mejorTiempoNormal; 
     private int victoriasContrareloj;
     private int derrotasTotales;
+    private int rachaVictoria;
+    private int rachaDerrota;
 
     // Constructor vacío
     public UsuarioEntity() {
@@ -33,8 +35,10 @@ public class UsuarioEntity {
     }
 
     // Getters y Setters
+    
+
     public String getEmail() {
-        return email;
+        return this.email;
     }
 
     public void setEmail(String email) {
@@ -42,7 +46,7 @@ public class UsuarioEntity {
     }
 
     public String getNombre() {
-        return nombre;
+        return this.nombre;
     }
 
     public void setNombre(String nombre) {
@@ -50,7 +54,7 @@ public class UsuarioEntity {
     }
 
     public String getContrasenia() {
-        return contrasenia;
+        return this.contrasenia;
     }
 
     public void setContrasenia(String contrasenia) {
@@ -58,7 +62,7 @@ public class UsuarioEntity {
     }
 
     public int getVictoriasFacil() {
-        return victoriasFacil;
+        return this.victoriasFacil;
     }
 
     public void setVictoriasFacil(int victoriasFacil) {
@@ -66,7 +70,7 @@ public class UsuarioEntity {
     }
 
     public int getVictoriasNormal() {
-        return victoriasNormal;
+        return this.victoriasNormal;
     }
 
     public void setVictoriasNormal(int victoriasNormal) {
@@ -74,7 +78,7 @@ public class UsuarioEntity {
     }
 
     public int getVictoriasDificil() {
-        return victoriasDificil;
+        return this.victoriasDificil;
     }
 
     public void setVictoriasDificil(int victoriasDificil) {
@@ -82,7 +86,7 @@ public class UsuarioEntity {
     }
 
     public Integer getMejorTiempoNormal() {
-        return mejorTiempoNormal;
+        return this.mejorTiempoNormal;
     }
 
     public void setMejorTiempoNormal(Integer mejorTiempoNormal) {
@@ -90,7 +94,7 @@ public class UsuarioEntity {
     }
 
     public int getVictoriasContrareloj() {
-        return victoriasContrareloj;
+        return this.victoriasContrareloj;
     }
 
     public void setVictoriasContrareloj(int victoriasContrareloj) {
@@ -98,13 +102,29 @@ public class UsuarioEntity {
     }
 
     public int getDerrotasTotales() {
-        return derrotasTotales;
+        return this.derrotasTotales;
     }
 
     public void setDerrotasTotales(int derrotasTotales) {
         this.derrotasTotales = derrotasTotales;
     }
 
+    public int getRachaVictoria() {
+        return this.rachaVictoria;
+    }
+
+    public void setRachaVictoria(int rachaVictoria) {
+        this.rachaVictoria = rachaVictoria;
+    }
+
+    public int getRachaDerrota() {
+        return this.rachaDerrota;
+    }
+
+    public void setRachaDerrota(int rachaDerrota) {
+        this.rachaDerrota = rachaDerrota;
+    }
+    
     // equals y hashCode basados en el email (clave única)
     @Override
     public boolean equals(Object o) {

@@ -6,13 +6,12 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="15" xmlns="http://javafx.com/javafx/23.0.1" stylesheets="@style.css" xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="es.ies.puerto.controller.EstadisticasController">
+<VBox alignment="CENTER" spacing="15" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.ies.puerto.controller.EstadisticasController">
     <padding>
         <Insets bottom="20" left="20" right="20" top="20" />
     </padding>
     
-    <Label text="Estadísticas del Jugador" style="-fx-font-weight: bold">
+    <Label style="-fx-font-weight: bold" text="Estadísticas del Jugador">
         <font>
             <Font size="18.0" />
         </font>
@@ -24,8 +23,8 @@
     <Label fx:id="mejorTiempoNormalLabel" />
     <Label fx:id="victoriasContrarelojLabel" />
     <Label fx:id="derrotasLabel" />
-    <Button fx:id="cerrarButton" onAction="#onCerrarClick" />
+    <Label fx:id="rachaVictoriaLabel" />
+    <Label fx:id="rachaDerrotaLabel" />
 
-    
-    <Button fx:id="cerrarButton" text="Cerrar" onAction="#onCerrarClick" />
+    <Button fx:id="cerrarButton" onAction="#onCerrarClick" text="Cerrar" />
 </VBox>

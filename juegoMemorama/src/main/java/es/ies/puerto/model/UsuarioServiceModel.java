@@ -1,5 +1,6 @@
 package es.ies.puerto.model;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,226 +10,208 @@ import es.ies.puerto.model.abtrastas.Conexion;
 
 public class UsuarioServiceModel extends Conexion {
 
-    /**
-     * * Constructor vacio
-     */
-    public UsuarioServiceModel() {
-    }
-    
-    /**
-     * * Constructor con path de conexion
-     * @param unaRutaArchivoBD ruta de la bbdd
-     * @throws SQLException error controlado
-     */
+    public UsuarioServiceModel() {}
+
     public UsuarioServiceModel(String unaRutaArchivoBD) throws SQLException {
         super(unaRutaArchivoBD);
     }
-    
-    /**
-     * * Funcion que devuelve la conexion a la bbdd
-     * @return ArrayList<UsuarioEntity> lista de usuarios
-     * @throws SQLException error controlado
-     */
+
     public ArrayList<UsuarioEntity> obtenerUsuarios() throws SQLException {
         String sql = "SELECT * FROM Usuario";
         return obtenerUsuario(sql);
     }
 
     public ArrayList<UsuarioEntity> obtenerUsuario(String sql) throws SQLException {
-        ArrayList<UsuarioEntity> usuarios = new ArrayList<UsuarioEntity>();
-        try {
-            PreparedStatement sentencia = getConnection().prepareStatement(sql);
-            ResultSet resultado = sentencia.executeQuery();
+        ArrayList<UsuarioEntity> usuarios = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
 
-            while (resultado.next()) {
-                String nombreStr = resultado.getString("nombre_usuario");
-                String contraseniaStr = resultado.getString("contrasenia");
-                String emailStr = resultado.getString("email");
-                UsuarioEntity usuarioModel = new UsuarioEntity(emailStr, nombreStr, contraseniaStr);
-                usuarios.add(usuarioModel);
+        try {
+            conn = getConnection();
+            stmt = conn.prepareStatement(sql);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                usuarios.add(new UsuarioEntity(
+                        rs.getString("email"),
+                        rs.getString("nombre_usuario"),
+                        rs.getString("contrasenia")
+                ));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
             cerrar();
         }
+
         return usuarios;
     }
 
-    /**
-     * * Metodo que obtiene las credenciales del usuario
-     * @param dato 
-     * @return UsuarioEntity usuario con las credenciales
-     */
-    public UsuarioEntity obtenerCredencialesUsuario(String dato) {
+    public int obtenerIdUsuario(String dato) throws SQLException {
+        String sql = "SELECT id FROM usuario WHERE email = ? OR nombre_usuario = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
         try {
-            String sql = "SELECT * FROM usuario WHERE email = ? OR nombre_usuario = ?";
-            PreparedStatement stmt = getConnection().prepareStatement(sql);
+            conn = getConnection();
+            stmt = conn.prepareStatement(sql);
             stmt.setString(1, dato);
             stmt.setString(2, dato);
-    
-            ResultSet rs = stmt.executeQuery();
+            rs = stmt.executeQuery();
+
+            if (rs.next()) return rs.getInt("id");
+
+        } finally {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            cerrar();
+        }
+
+        return -1;
+    }
+
+    public UsuarioEntity obtenerCredencialesUsuario(String nombreOEmail) {
+        UsuarioEntity usuario = null;
+        Connection conn = null;
+
+        try {
+            conn = getConnection();
+            String sql = "SELECT * FROM usuario WHERE email = ? OR nombre_usuario = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, nombreOEmail);
+            ps.setString(2, nombreOEmail);
+            ResultSet rs = ps.executeQuery();
+
             if (rs.next()) {
-                UsuarioEntity usuario = new UsuarioEntity(
-                    rs.getString("email"),
-                    rs.getString("nombre_usuario"),
-                    rs.getString("contrasenia")
-                );
-    
-                // Nuevas estadísticas
-                usuario.setVictoriasFacil(rs.getInt("victorias_facil"));
-                usuario.setVictoriasNormal(rs.getInt("victorias_normal"));
-                usuario.setVictoriasDificil(rs.getInt("victorias_dificil"));
-                usuario.setMejorTiempoNormal(rs.getInt("mejor_tiempo_normal"));
-                usuario.setVictoriasContrareloj(rs.getInt("victorias_contrareloj"));
-                usuario.setDerrotasTotales(rs.getInt("derrotas_totales"));
-    
-                return usuario;
+                int idUsuario = rs.getInt("id");
+                usuario = new UsuarioEntity(rs.getString("email"), rs.getString("nombre_usuario"), rs.getString("contrasenia"));
+
+                // Estadísticas
+                sql = "SELECT * FROM estadisticas_usuario WHERE id_usuario = ? AND dificultad = 'facil'";
+                PreparedStatement psEst = conn.prepareStatement(sql);
+                psEst.setInt(1, idUsuario);
+                ResultSet rsEst = psEst.executeQuery();
+
+                if (rsEst.next()) {
+                    usuario.setVictoriasNormal(rsEst.getInt("victorias_normal"));
+                    usuario.setMejorTiempoNormal(rsEst.getInt("mejor_tiempo_normal"));
+                    usuario.setVictoriasContrareloj(rsEst.getInt("victorias_contrareloj"));
+                }
+
+                rsEst.close();
+                psEst.close();
             }
-        } catch (Exception e) {
+
+            rs.close();
+            ps.close();
+
+        } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            try {
-                cerrar();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            try { cerrar(); } catch (SQLException e) { e.printStackTrace(); }
         }
-        return null;
-    }
-    
 
-    /**
-     * * Metodo que obtiene las credenciales del usuario
-     * @param usuario 
-     * @return boolean true si se ha podido agregar el usuario
-     * @throws SQLException error controlado
-     */
+        return usuario;
+    }
+
     public boolean agregarUsuario(UsuarioEntity usuario) throws SQLException {
-        if (usuario == null) {
-            return false;
-        }
-        ArrayList<UsuarioEntity> usuarios = obtenerUsuarios();
-        String sql = "INSERT  INTO usuario (nombre_usuario,email,contrasenia) VALUES ('" + usuario.getNombre() + "', '"
-                + usuario.getEmail() + "', '" + usuario.getContrasenia() + "')";
+        if (usuario == null) return false;
 
-        if (usuarios.contains(usuario)) {
-            return false;
-        }
+        String sql = "INSERT INTO usuario (nombre_usuario, email, contrasenia) VALUES (?, ?, ?)";
+        Connection conn = null;
+        PreparedStatement stmt = null;
 
         try {
-            PreparedStatement sentencia = getConnection().prepareStatement(sql);
-            sentencia.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
+            conn = getConnection();
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, usuario.getNombre());
+            stmt.setString(2, usuario.getEmail());
+            stmt.setString(3, usuario.getContrasenia());
+
+            return stmt.executeUpdate() > 0;
+
         } finally {
+            if (stmt != null) stmt.close();
             cerrar();
         }
-        return true;
     }
 
-    /**
-     * * Metodo que edita el usuario
-     * @param usuario
-     * @return boolean true si se ha podido editar el usuario
-     * @throws SQLException error controlado
-     */
     public boolean editarUsuario(UsuarioEntity usuario) throws SQLException {
-        if (usuario == null) {
-            return false;
-        }
+        if (usuario == null) return false;
 
-        String sql = "UPDATE usuario SET nombre_usuario = '" + usuario.getNombre() + 
-                     "', email = '" + usuario.getEmail() + 
-                     "', contrasenia = '" + usuario.getContrasenia() + "'";
+        String sql = "UPDATE usuario SET nombre_usuario = ?, email = ?, contrasenia = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
 
         try {
-            PreparedStatement sentencia = getConnection().prepareStatement(sql);
-            sentencia.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            conn = getConnection();
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, usuario.getNombre());
+            stmt.setString(2, usuario.getEmail());
+            stmt.setString(3, usuario.getContrasenia());
+
+            return stmt.executeUpdate() > 0;
+
         } finally {
+            if (stmt != null) stmt.close();
             cerrar();
         }
     }
-    
-    /**
-     * * Metodo que edita el usuario
-     * @param usuario 
-     * @param emailOriginal 
-     * @return boolean true si se ha podido editar el usuario
-     * @throws SQLException error controlado
-     */
+
     public boolean editarUsuario(UsuarioEntity usuario, String emailOriginal) throws SQLException {
-        if (usuario == null || emailOriginal == null || emailOriginal.isEmpty()) {
-            return false;
-        }
+        if (usuario == null || emailOriginal == null || emailOriginal.isEmpty()) return false;
 
-        // Actualizar el registro basado en el email original
-        String sql = "UPDATE usuario SET nombre_usuario = '" + usuario.getNombre() + 
-                     "', email = '" + usuario.getEmail() + 
-                     "', contrasenia = '" + usuario.getContrasenia() + 
-                     "' WHERE email = '" + emailOriginal + "'";
+        String sql = "UPDATE usuario SET nombre_usuario = ?, email = ?, contrasenia = ? WHERE email = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
 
         try {
-            PreparedStatement sentencia = getConnection().prepareStatement(sql);
-            int filasActualizadas = sentencia.executeUpdate();
-            return filasActualizadas > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            conn = getConnection();
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, usuario.getNombre());
+            stmt.setString(2, usuario.getEmail());
+            stmt.setString(3, usuario.getContrasenia());
+            stmt.setString(4, emailOriginal);
+
+            return stmt.executeUpdate() > 0;
+
         } finally {
+            if (stmt != null) stmt.close();
             cerrar();
         }
     }
 
-    /**
-     * * Metodo que elimina el usuario
-     * @param email
-     * @return boolean true si se ha podido eliminar el usuario
-     * @throws SQLException error controlado
-     */
     public boolean eliminarUsuario(String email) throws SQLException {
-        if (email == null || email.isEmpty()) {
-            return false;
-        }
+        if (email == null || email.isEmpty()) return false;
 
-        String sql = "DELETE FROM usuario WHERE email = '" + email + "'";
+        String sql = "DELETE FROM usuario WHERE email = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
 
         try {
-            PreparedStatement sentencia = getConnection().prepareStatement(sql);
-            int filasEliminadas = sentencia.executeUpdate();
-            return filasEliminadas > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            conn = getConnection();
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, email);
+
+            return stmt.executeUpdate() > 0;
+
         } finally {
+            if (stmt != null) stmt.close();
             cerrar();
         }
     }
 
-
-    /**
-     * * Metodo que actualiza las estadisticas del usuario
-     * @param usuario
-     * @return boolean true si se ha podido actualizar el usuario
-     * @throws SQLException error controlado
-     */
     public boolean actualizarEstadisticas(UsuarioEntity usuario) throws SQLException {
-        String sql = "UPDATE usuario SET " +
-                     "victorias_facil = ?, " +
-                     "victorias_normal = ?, " +
-                     "victorias_dificil = ?, " +
-                     "mejor_tiempo_normal = ?, " +
-                     "victorias_contrareloj = ?, " +
-                     "derrotas_totales = ? " +
-                     "WHERE email = ?";
-    
+        String sql = "UPDATE usuario SET victorias_facil = ?, victorias_normal = ?, victorias_dificil = ?, " +
+                     "mejor_tiempo_normal = ?, victorias_contrareloj = ?, derrotas_totales = ? WHERE email = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
         try {
-            PreparedStatement stmt = getConnection().prepareStatement(sql);
+            conn = getConnection();
+            stmt = conn.prepareStatement(sql);
             stmt.setInt(1, usuario.getVictoriasFacil());
             stmt.setInt(2, usuario.getVictoriasNormal());
             stmt.setInt(3, usuario.getVictoriasDificil());
@@ -236,19 +219,65 @@ public class UsuarioServiceModel extends Conexion {
             stmt.setInt(5, usuario.getVictoriasContrareloj());
             stmt.setInt(6, usuario.getDerrotasTotales());
             stmt.setString(7, usuario.getEmail());
+
+            return stmt.executeUpdate() > 0;
+
+        } finally {
+            if (stmt != null) stmt.close();
+            cerrar();
+        }
+    }
+
+    public UsuarioEstadisticasEntity obtenerEstadisticasPorDificultad(String dato, String dificultad) throws SQLException {
+        int idUsuario = obtenerIdUsuario(dato);
+        if (idUsuario == -1) return null;
+
+        String sql = "SELECT * FROM estadisticas_usuario WHERE id_usuario = ? AND dificultad = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, idUsuario);
+            stmt.setString(2, dificultad);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                UsuarioEstadisticasEntity est = new UsuarioEstadisticasEntity();
+                est.setDificultad(dificultad);
+                est.setVictoriasNormal(rs.getInt("victorias_normal"));
+                est.setMejorTiempoNormal(rs.getInt("mejor_tiempo_normal"));
+                est.setVictoriasContrareloj(rs.getInt("victorias_contrareloj"));
+                return est;
+            }
+
+        } finally {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            cerrar();
+        }
+
+        return null;
+    }
+
+    public boolean actualizarEstadisticasPorDificultad(String email, UsuarioEstadisticasEntity est) throws SQLException {
+        int idUsuario = obtenerIdUsuario(email);
+        if (idUsuario == -1) return false;
+    
+        String sql = "UPDATE estadisticas_usuario SET victorias_normal = ?, mejor_tiempo_normal = ?, victorias_contrareloj = ? WHERE id_usuario = ? AND dificultad = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+    
+            stmt.setInt(1, est.getVictoriasNormal());
+            stmt.setInt(2, est.getMejorTiempoNormal());
+            stmt.setInt(3, est.getVictoriasContrareloj());
+            stmt.setInt(4, idUsuario);
+            stmt.setString(5, est.getDificultad());
     
             return stmt.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            try {
-                cerrar(); 
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
     }
     
-
 }

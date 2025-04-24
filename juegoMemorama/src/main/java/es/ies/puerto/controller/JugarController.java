@@ -18,7 +18,12 @@ import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.scene.paint.Color;
 
+import java.sql.SQLException;
 import java.util.*;
+
+import es.ies.puerto.model.UsuarioEntity;
+import es.ies.puerto.model.UsuarioEstadisticasEntity;
+import es.ies.puerto.model.UsuarioServiceModel;
 
 public class JugarController {
 
@@ -43,9 +48,21 @@ public class JugarController {
     private int tiempoLimite = 75;
     private List<Card> allCards = new ArrayList<>();
 
-    public void inicializarJuego(){
+    private UsuarioEntity usuarioActual;
+
+    public void setUsuarioActual(UsuarioEntity usuarioActual) {
+        this.usuarioActual = usuarioActual;
+    }
+
+    private String dificultadActual;
+    public void setDificultadActual(String dificultad) {
+    this.dificultadActual = dificultad;
+}
+
+    public void inicializarJuego() {
         setupGame();
     }
+
     public void setPairCount(int pairCount) {
         this.pairCount = pairCount;
     }
@@ -77,7 +94,13 @@ public class JugarController {
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols && index < paths.size(); c++) {
                 Card card = new Card(paths.get(index++));
-                card.setOnMouseClicked(this::handleClick);
+                card.setOnMouseClicked(event -> {
+                    try {
+                        handleClick(event);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                });
                 grid.add(card, c, r);
                 allCards.add(card);
             }
@@ -88,14 +111,18 @@ public class JugarController {
     private void startTimer() {
         secondsElapsed = contrareloj ? tiempoLimite : 0;
         timeLabel.setText("Tiempo: " + secondsElapsed + "s");
-    
+
         timer = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
             if (contrareloj) {
                 secondsElapsed--;
                 timeLabel.setText("Tiempo: " + secondsElapsed + "s");
                 if (secondsElapsed <= 0) {
                     timer.stop();
-                    handleGameOver();
+                    try {
+                        handleGameOver();
+                    } catch (SQLException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             } else {
                 secondsElapsed++;
@@ -105,10 +132,8 @@ public class JugarController {
         timer.setCycleCount(Animation.INDEFINITE);
         timer.play();
     }
-    
-    
 
-    private void handleClick(MouseEvent e) {
+    private void handleClick(MouseEvent e) throws SQLException {
         if (isProcessing)
             return;
 
@@ -157,7 +182,7 @@ public class JugarController {
         movesLabel.setText("Movimientos: " + moves);
     }
 
-    private void showWinAnimation() {
+    private void showWinAnimation() throws SQLException {
         timer.stop();
         SoundPlayer.play("win.mp3", 1, 0);
 
@@ -168,7 +193,7 @@ public class JugarController {
             shake.setAutoReverse(true);
             shake.play();
         }
-
+        guardarEstadisticas(true); 
         Text win = new Text(" ¡Ganaste! ");
         win.setFont(Font.font("System", 60));
         win.setFill(Color.YELLOW);
@@ -182,49 +207,46 @@ public class JugarController {
 
     private boolean isGameOver = false;
 
-    private void handleGameOver() {
+    private void handleGameOver() throws SQLException {
         isGameOver = true;
         for (Card c : allCards) {
-            c.setDisable(true); 
+            c.setDisable(true);
         }
-    
+
         SoundPlayer.play("lose.mp3", 1, 0);
-    
+        guardarEstadisticas(false);
         Text lose = new Text(" ¡Perdiste! ");
         lose.setFont(Font.font("System", 60));
         lose.setFill(Color.RED);
         lose.setStroke(Color.BLACK);
         lose.setStrokeWidth(0.7);
         ((StackPane) grid.getScene().getRoot()).getChildren().add(lose);
-    
+
         PauseTransition wait = new PauseTransition(Duration.seconds(1.5));
         wait.setOnFinished(e -> {
             SequentialTransition st = new SequentialTransition();
-    
+
             for (Card c : allCards) {
-                if (c.isFlipped()) { 
+                if (c.isFlipped()) {
                     PauseTransition pt = new PauseTransition(Duration.millis(200));
                     pt.setOnFinished(ev -> {
-                        c.setMatched(false); 
-                        SoundPlayer.play("flip.mp3", 0.5, 0);  
-                        c.flip(); 
+                        c.setMatched(false);
+                        SoundPlayer.play("flip.mp3", 0.5, 0);
+                        c.flip();
                     });
                     st.getChildren().add(pt);
                 }
             }
-    
+
             PauseTransition extraWait = new PauseTransition(Duration.seconds(3));
             extraWait.setOnFinished(ev -> returnToMenu());
-    
+
             st.setOnFinished(ev -> extraWait.play());
             st.play();
         });
-    
+
         wait.play();
     }
-    
-    
-    
 
     private void returnToMenu() {
         try {
@@ -237,58 +259,68 @@ public class JugarController {
         }
     }
 
-    /**
-     * Clase de la carta
-     */
-    private static class Card extends ImageView {
-        private final String imagePath;
-        private boolean matched = false;
-        private boolean flipped = false;
-        private final Image back = new Image(Card.class.getResource("/images/back.png").toString());
 
-        public Card(String path) {
-            this.imagePath = path;
-            setImage(back);
-            setFitWidth(100);
-            setFitHeight(100);
+    private void guardarEstadisticas(boolean victoria) throws SQLException {
+        if (usuarioActual == null || dificultadActual == null) return;
+    
+        UsuarioServiceModel servicio = new UsuarioServiceModel("src\\main\\resources\\usuarios.db");
+    
+        try {
+            UsuarioEstadisticasEntity estadisticas = servicio.obtenerEstadisticasPorDificultad(usuarioActual.getEmail(), dificultadActual);
+            if (estadisticas == null) {
+                estadisticas = new UsuarioEstadisticasEntity();
+                estadisticas.setDificultad(dificultadActual);
+            }
+    
+            if (victoria) {
+                if (contrareloj) {
+                    estadisticas.setVictoriasContrareloj(estadisticas.getVictoriasContrareloj() + 1);
+                } else {
+                    estadisticas.setVictoriasNormal(estadisticas.getVictoriasNormal() + 1);
+                    int tiempoActual = secondsElapsed;
+                    if (estadisticas.getMejorTiempoNormal() == 0 || tiempoActual < estadisticas.getMejorTiempoNormal()) {
+                        estadisticas.setMejorTiempoNormal(tiempoActual);
+                    }
+                }
+    
+                usuarioActual.setRachaDerrota(0);
+                usuarioActual.setRachaVictoria(usuarioActual.getRachaVictoria() + 1);
+    
+            } else {
+                usuarioActual.setDerrotasTotales(usuarioActual.getDerrotasTotales() + 1);
+                usuarioActual.setRachaVictoria(0);
+                usuarioActual.setRachaDerrota(usuarioActual.getRachaDerrota() + 1);
+            }
+    
+            switch (dificultadActual.toLowerCase()) {
+    case "fácil":
+        if (contrareloj) {
+            usuarioActual.setVictoriasContrareloj(usuarioActual.getVictoriasContrareloj() + 1);
+        } else {
+            usuarioActual.setVictoriasFacil(usuarioActual.getVictoriasFacil() + 1);
         }
-
-        public void flip() {
-            RotateTransition rt = new RotateTransition(Duration.millis(200), this);
-            rt.setAxis(Rotate.Y_AXIS);
-            rt.setFromAngle(0);
-            rt.setToAngle(90);
-            rt.setOnFinished(e -> {
-                flipped = !flipped;
-
-                Image imgToShow = flipped
-                        ? new Image(Card.class.getResource(imagePath).toString())
-                        : back;
-                setImage(imgToShow);
-
-                RotateTransition rt2 = new RotateTransition(Duration.millis(200), this);
-                rt2.setAxis(Rotate.Y_AXIS);
-                rt2.setFromAngle(270);
-                rt2.setToAngle(360);
-                rt2.play();
-            });
-            rt.play();
+        break;
+    case "normal":
+        if (contrareloj) {
+            usuarioActual.setVictoriasContrareloj(usuarioActual.getVictoriasContrareloj() + 1);
+        } else {
+            usuarioActual.setVictoriasNormal(usuarioActual.getVictoriasNormal() + 1);
         }
-
-        public boolean isFlipped() {
-            return flipped;
+        break;
+    case "difícil":
+        if (contrareloj) {
+            usuarioActual.setVictoriasContrareloj(usuarioActual.getVictoriasContrareloj() + 1);
+        } else {
+            usuarioActual.setVictoriasDificil(usuarioActual.getVictoriasDificil() + 1);
         }
-
-        public boolean isMatched() {
-            return matched;
-        }
-
-        public void setMatched(boolean b) {
-            matched = b;
-        }
-
-        public String getImagePath() {
-            return imagePath;
-        }
+        break; }}
+       catch (Exception e) {
+        e.printStackTrace();
     }
-}
+
+    
+    
+
+
+
+}}

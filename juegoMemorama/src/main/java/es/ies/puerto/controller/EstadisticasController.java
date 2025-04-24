@@ -4,8 +4,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
-import es.ies.puerto.model.UsuarioSesion;
-import es.ies.puerto.model.UsuarioEntity;
+
+import java.sql.SQLException;
+
+import es.ies.puerto.model.*;
 
 public class EstadisticasController {
     @FXML
@@ -21,34 +23,42 @@ public class EstadisticasController {
     @FXML
     private Label derrotasLabel;
     @FXML
+    private Label rachaVictoriaLabel;
+    @FXML
+    private Label rachaDerrotaLabel;
+    @FXML
     private Button cerrarButton;
 
-    /**
-     * Método que se ejecuta al inicializar la ventana de estadísticas.
-     * Muestra las estadísticas del usuario actual en la interfaz gráfica.
-     */
     @FXML
     public void initialize() {
         UsuarioEntity usuario = UsuarioSesion.getInstancia().getUsuario();
-
+    
+        try {
+            UsuarioServiceModel servicio = new UsuarioServiceModel("src/main/resources/usuarios.db");
+    
+            // Cargar estadísticas desde la base de datos
+            UsuarioEstadisticasEntity estNormal = servicio.obtenerEstadisticasPorDificultad(usuario.getEmail(), "normal");
+            if (estNormal != null && estNormal.getMejorTiempoNormal() > 0) {
+                mejorTiempoNormalLabel.setText("Mejor tiempo (normal): " + estNormal.getMejorTiempoNormal() + " s");
+            } else {
+                mejorTiempoNormalLabel.setText("Mejor tiempo (normal): No disponible");
+            }
+    
+        } catch (Exception e) {
+            e.printStackTrace();
+            mejorTiempoNormalLabel.setText("Error al cargar estadísticas");
+        }
+    
         victoriasFacilLabel.setText("Victorias en fácil: " + usuario.getVictoriasFacil());
         victoriasNormalLabel.setText("Victorias en normal: " + usuario.getVictoriasNormal());
         victoriasDificilLabel.setText("Victorias en difícil: " + usuario.getVictoriasDificil());
-
-        if (usuario.getMejorTiempoNormal() != null) {
-            mejorTiempoNormalLabel.setText("Mejor tiempo (normal): " + usuario.getMejorTiempoNormal() + " s");
-        } else {
-            mejorTiempoNormalLabel.setText("Mejor tiempo (normal): No disponible");
-        }
-
+        rachaVictoriaLabel.setText("Racha de victorias: " + usuario.getRachaVictoria());
+        rachaDerrotaLabel.setText("Racha de derrotas: " + usuario.getRachaDerrota());
         victoriasContrarelojLabel.setText("Victorias en contrarreloj: " + usuario.getVictoriasContrareloj());
         derrotasLabel.setText("Derrotas totales: " + usuario.getDerrotasTotales());
     }
+    
 
-    /**
-     * Método que se ejecuta al hacer clic en el botón de cerrar.
-     * Cierra la ventana de estadísticas.
-     */
     @FXML
     private void onCerrarClick() {
         Stage stage = (Stage) cerrarButton.getScene().getWindow();

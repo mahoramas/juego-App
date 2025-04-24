@@ -6,6 +6,7 @@ module es.ies.puerto {
     requires javafx.graphics;
     requires java.sql;
     requires javafx.media;
+    requires javafx.base;
 
     opens es.ies.puerto to javafx.fxml;
     exports es.ies.puerto;

@@ -1,6 +1,5 @@
 package es.ies.puerto.controller;
 
-
 import es.ies.puerto.PrincipalApplication;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -26,6 +25,8 @@ public class MenuController {
 
     @FXML
     private Button onVolverButton;
+
+
 
     private void startGame(int pairCount, Button button) {
         try {
@@ -61,7 +62,6 @@ public class MenuController {
             e.printStackTrace();
         }
     }
-    
 
     @FXML
     protected void openVolverClick() {
@@ -77,8 +77,9 @@ public class MenuController {
         }
     }
 
-
     @FXML private void startEasy() { startGame(4, playEasy); }
+
     @FXML private void startNormal() { startGame(8, playNormal); }
+
     @FXML private void startHard() { startGame(18, playHard); }
 }
