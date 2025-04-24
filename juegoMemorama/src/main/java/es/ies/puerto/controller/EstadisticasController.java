@@ -9,56 +9,45 @@ import es.ies.puerto.model.UsuarioEntity;
 
 public class EstadisticasController {
     @FXML
-    private Label nivelActualLabel;
+    private Label victoriasFacilLabel;
     @FXML
-    private Label victoriasLabel;
+    private Label victoriasNormalLabel;
+    @FXML
+    private Label victoriasDificilLabel;
+    @FXML
+    private Label mejorTiempoNormalLabel;
+    @FXML
+    private Label victoriasContrarelojLabel;
     @FXML
     private Label derrotasLabel;
-    @FXML
-    private Label rachaLabel;
-    @FXML
-    private Label victoriasNivelLabel;
     @FXML
     private Button cerrarButton;
 
     /**
-     * * Método que se ejecuta al inicializar la ventana de estadísticas.
-     * * Muestra las estadísticas del usuario actual en la interfaz gráfica.
+     * Método que se ejecuta al inicializar la ventana de estadísticas.
+     * Muestra las estadísticas del usuario actual en la interfaz gráfica.
      */
     @FXML
     public void initialize() {
         UsuarioEntity usuario = UsuarioSesion.getInstancia().getUsuario();
-        
-        nivelActualLabel.setText("Nivel actual: " + getNombreNivel(usuario.getNivelActual()));
-        victoriasLabel.setText("Victorias totales: " + usuario.getVictoriasTotales());
-        derrotasLabel.setText("Derrotas totales: " + usuario.getDerrotasTotales());
-        rachaLabel.setText("Mayor racha: " + usuario.getMayorRacha());
-        
-        int victoriasRestantes = 3 - usuario.getVictoriasNivel();
-        if (usuario.getNivelActual() == 3) {
-            victoriasNivelLabel.setText("¡Has alcanzado el nivel máximo!");
+
+        victoriasFacilLabel.setText("Victorias en fácil: " + usuario.getVictoriasFacil());
+        victoriasNormalLabel.setText("Victorias en normal: " + usuario.getVictoriasNormal());
+        victoriasDificilLabel.setText("Victorias en difícil: " + usuario.getVictoriasDificil());
+
+        if (usuario.getMejorTiempoNormal() != null) {
+            mejorTiempoNormalLabel.setText("Mejor tiempo (normal): " + usuario.getMejorTiempoNormal() + " s");
         } else {
-            victoriasNivelLabel.setText("Victorias para siguiente nivel: " + victoriasRestantes);
+            mejorTiempoNormalLabel.setText("Mejor tiempo (normal): No disponible");
         }
+
+        victoriasContrarelojLabel.setText("Victorias en contrarreloj: " + usuario.getVictoriasContrareloj());
+        derrotasLabel.setText("Derrotas totales: " + usuario.getDerrotasTotales());
     }
 
     /**
-     * * Método que devuelve el nombre del nivel según su número.
-     * @param nivel Número del nivel (1, 2 o 3).
-     * @return Nombre del nivel correspondiente.
-     */
-    private String getNombreNivel(int nivel) {
-        switch (nivel) {
-            case 1: return "Fácil";
-            case 2: return "Medio";
-            case 3: return "Difícil";
-            default: return "Desconocido";
-        }
-    }
-
-    /**
-     * * Método que se ejecuta al hacer clic en el botón de cerrar.
-     * * Cierra la ventana de estadísticas.
+     * Método que se ejecuta al hacer clic en el botón de cerrar.
+     * Cierra la ventana de estadísticas.
      */
     @FXML
     private void onCerrarClick() {

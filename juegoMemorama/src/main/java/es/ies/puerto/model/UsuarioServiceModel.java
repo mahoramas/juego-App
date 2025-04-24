@@ -66,7 +66,7 @@ public class UsuarioServiceModel extends Conexion {
             PreparedStatement stmt = getConnection().prepareStatement(sql);
             stmt.setString(1, dato);
             stmt.setString(2, dato);
-            
+    
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 UsuarioEntity usuario = new UsuarioEntity(
@@ -74,15 +74,15 @@ public class UsuarioServiceModel extends Conexion {
                     rs.getString("nombre_usuario"),
                     rs.getString("contrasenia")
                 );
-                // Cargar estadísticas
-                usuario.setNivelActual(rs.getInt("nivel_actual"));
-                usuario.setVictoriasTotales(rs.getInt("victorias_totales"));
+    
+                // Nuevas estadísticas
+                usuario.setVictoriasFacil(rs.getInt("victorias_facil"));
+                usuario.setVictoriasNormal(rs.getInt("victorias_normal"));
+                usuario.setVictoriasDificil(rs.getInt("victorias_dificil"));
+                usuario.setMejorTiempoNormal(rs.getInt("mejor_tiempo_normal"));
+                usuario.setVictoriasContrareloj(rs.getInt("victorias_contrareloj"));
                 usuario.setDerrotasTotales(rs.getInt("derrotas_totales"));
-                usuario.setVictoriasNivel(rs.getInt("victorias_nivel"));
-                usuario.setMayorRacha(rs.getInt("mayor_racha"));
-                usuario.setRachaActual(rs.getInt("racha_actual"));
-                usuario.setDerrotasConsecutivas(rs.getInt("derrotas_consecutivas"));
-                
+    
                 return usuario;
             }
         } catch (Exception e) {
@@ -96,6 +96,7 @@ public class UsuarioServiceModel extends Conexion {
         }
         return null;
     }
+    
 
     /**
      * * Metodo que obtiene las credenciales del usuario
@@ -209,32 +210,6 @@ public class UsuarioServiceModel extends Conexion {
         }
     }
 
-    /**
-     * * Metodo que obtiene una palabra aleatoria de la base de datos
-     * @param nivel 
-     * @return String palabra aleatoria
-     */
-    public String obtenerPalabraAleatoria(int nivel) {
-        try {
-            String sql = "SELECT palabra FROM palabra WHERE id_nivel = ? ORDER BY RANDOM() LIMIT 1";
-            PreparedStatement stmt = getConnection().prepareStatement(sql);
-            stmt.setInt(1, nivel);
-            
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getString("palabra");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                cerrar();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return "casa"; 
-    }
 
     /**
      * * Metodo que actualiza las estadisticas del usuario
@@ -244,26 +219,24 @@ public class UsuarioServiceModel extends Conexion {
      */
     public boolean actualizarEstadisticas(UsuarioEntity usuario) throws SQLException {
         String sql = "UPDATE usuario SET " +
-                     "nivel_actual = ?, " +
-                     "victorias_totales = ?, " +
-                     "derrotas_totales = ?, " +
-                     "victorias_nivel = ?, " +
-                     "mayor_racha = ?, " +
-                     "racha_actual = ?, " +
-                     "derrotas_consecutivas = ? " +
+                     "victorias_facil = ?, " +
+                     "victorias_normal = ?, " +
+                     "victorias_dificil = ?, " +
+                     "mejor_tiempo_normal = ?, " +
+                     "victorias_contrareloj = ?, " +
+                     "derrotas_totales = ? " +
                      "WHERE email = ?";
-        
+    
         try {
             PreparedStatement stmt = getConnection().prepareStatement(sql);
-            stmt.setInt(1, usuario.getNivelActual());
-            stmt.setInt(2, usuario.getVictoriasTotales());
-            stmt.setInt(3, usuario.getDerrotasTotales());
-            stmt.setInt(4, usuario.getVictoriasNivel());
-            stmt.setInt(5, usuario.getMayorRacha());
-            stmt.setInt(6, usuario.getRachaActual());
-            stmt.setInt(7, usuario.getDerrotasConsecutivas());
-            stmt.setString(8, usuario.getEmail());
-            
+            stmt.setInt(1, usuario.getVictoriasFacil());
+            stmt.setInt(2, usuario.getVictoriasNormal());
+            stmt.setInt(3, usuario.getVictoriasDificil());
+            stmt.setInt(4, usuario.getMejorTiempoNormal());
+            stmt.setInt(5, usuario.getVictoriasContrareloj());
+            stmt.setInt(6, usuario.getDerrotasTotales());
+            stmt.setString(7, usuario.getEmail());
+    
             return stmt.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -276,4 +249,6 @@ public class UsuarioServiceModel extends Conexion {
             }
         }
     }
+    
+
 }

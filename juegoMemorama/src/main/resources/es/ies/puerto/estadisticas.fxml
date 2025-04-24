@@ -18,11 +18,14 @@
         </font>
     </Label>
     
-    <Label fx:id="nivelActualLabel" text="Nivel actual: " />
-    <Label fx:id="victoriasLabel" text="Victorias totales: " />
-    <Label fx:id="derrotasLabel" text="Derrotas totales: " />
-    <Label fx:id="rachaLabel" text="Mayor racha: " />
-    <Label fx:id="victoriasNivelLabel" text="Victorias para siguiente nivel: " />
+    <Label fx:id="victoriasFacilLabel" />
+    <Label fx:id="victoriasNormalLabel" />
+    <Label fx:id="victoriasDificilLabel" />
+    <Label fx:id="mejorTiempoNormalLabel" />
+    <Label fx:id="victoriasContrarelojLabel" />
+    <Label fx:id="derrotasLabel" />
+    <Button fx:id="cerrarButton" onAction="#onCerrarClick" />
+
     
     <Button fx:id="cerrarButton" text="Cerrar" onAction="#onCerrarClick" />
 </VBox>
