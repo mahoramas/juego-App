@@ -146,4 +146,8 @@ public class UsuarioEntity {
                ", nombre='" + nombre + '\'' +
                ", contrasenia='" + contrasenia + '\'';
     }
+
+    public int getVictoriasTotal() {
+        return getVictoriasDificil()+getVictoriasFacil()+getVictoriasNormal();
+    }
 }

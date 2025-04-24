@@ -34,21 +34,17 @@ public class EstadisticasController {
         UsuarioEntity usuario = UsuarioSesion.getInstancia().getUsuario();
     
         try {
-            UsuarioServiceModel servicio = new UsuarioServiceModel("src/main/resources/usuarios.db");
     
-            // Cargar estadísticas desde la base de datos
-            UsuarioEstadisticasEntity estNormal = servicio.obtenerEstadisticasPorDificultad(usuario.getEmail(), "normal");
-            if (estNormal != null && estNormal.getMejorTiempoNormal() > 0) {
-                mejorTiempoNormalLabel.setText("Mejor tiempo (normal): " + estNormal.getMejorTiempoNormal() + " s");
+            if (usuario != null && usuario.getMejorTiempoNormal() > 0) {
+                mejorTiempoNormalLabel.setText("Mejor tiempo (normal): " + usuario.getMejorTiempoNormal() + " s");
             } else {
                 mejorTiempoNormalLabel.setText("Mejor tiempo (normal): No disponible");
             }
-    
+          
         } catch (Exception e) {
             e.printStackTrace();
             mejorTiempoNormalLabel.setText("Error al cargar estadísticas");
         }
-    
         victoriasFacilLabel.setText("Victorias en fácil: " + usuario.getVictoriasFacil());
         victoriasNormalLabel.setText("Victorias en normal: " + usuario.getVictoriasNormal());
         victoriasDificilLabel.setText("Victorias en difícil: " + usuario.getVictoriasDificil());

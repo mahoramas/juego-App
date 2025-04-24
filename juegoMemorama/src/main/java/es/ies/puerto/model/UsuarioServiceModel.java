@@ -203,22 +203,34 @@ public class UsuarioServiceModel extends Conexion {
         }
     }
 
-    public boolean actualizarEstadisticas(UsuarioEntity usuario) throws SQLException {
-        String sql = "UPDATE usuario SET victorias_facil = ?, victorias_normal = ?, victorias_dificil = ?, " +
-                     "mejor_tiempo_normal = ?, victorias_contrareloj = ?, derrotas_totales = ? WHERE email = ?";
+    public boolean actualizarEstadisticas(UsuarioEntity usuario, String dificultad) throws SQLException {
+        String sql = "UPDATE estadisticas_usuario SET  victorias_normal = ? " +
+                     ", mejor_tiempo_normal = ?, victorias_contrareloj = ? WHERE id_usuario = ? and dificultad=?";
         Connection conn = null;
         PreparedStatement stmt = null;
-
+        String sql2="select id from usuario where nombre_usuario='"+usuario.getNombre()+"'";
+        int id=0;
+        try{
+            conn=getConnection();
+            stmt=conn.prepareStatement(sql2);
+            ResultSet rsEst = stmt.executeQuery();
+            if (rsEst.next()) {
+                id=rsEst.getInt("id");
+            }
+            
+        } finally {
+            if (stmt != null) stmt.close();
+            cerrar();
+        }
         try {
             conn = getConnection();
             stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, usuario.getVictoriasFacil());
-            stmt.setInt(2, usuario.getVictoriasNormal());
-            stmt.setInt(3, usuario.getVictoriasDificil());
-            stmt.setInt(4, usuario.getMejorTiempoNormal());
-            stmt.setInt(5, usuario.getVictoriasContrareloj());
-            stmt.setInt(6, usuario.getDerrotasTotales());
-            stmt.setString(7, usuario.getEmail());
+            stmt.setInt(1, usuario.getVictoriasTotal());
+            stmt.setInt(2, usuario.getMejorTiempoNormal());
+            stmt.setInt(3, usuario.getVictoriasContrareloj());
+
+            stmt.setInt(4, id);
+            stmt.setString(5, dificultad);
 
             return stmt.executeUpdate() > 0;
 

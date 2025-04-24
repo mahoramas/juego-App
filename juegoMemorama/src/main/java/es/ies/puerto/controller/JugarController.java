@@ -4,6 +4,7 @@ import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.*;
 import javafx.scene.input.MouseEvent;
@@ -24,6 +25,7 @@ import java.util.*;
 import es.ies.puerto.model.UsuarioEntity;
 import es.ies.puerto.model.UsuarioEstadisticasEntity;
 import es.ies.puerto.model.UsuarioServiceModel;
+import es.ies.puerto.model.UsuarioSesion;
 
 public class JugarController {
 
@@ -55,11 +57,26 @@ public class JugarController {
     }
 
     private String dificultadActual;
+
     public void setDificultadActual(String dificultad) {
-    this.dificultadActual = dificultad;
-}
+        this.dificultadActual = dificultad;
+    }
 
     public void inicializarJuego() {
+        switch (pairCount) {
+            case 4:
+                dificultadActual="facil";
+                break;
+            case 6:
+                dificultadActual="medio";
+                break;
+            case 18:
+                dificultadActual="dificil";
+                break;
+
+          
+        }
+        usuarioActual = UsuarioSesion.getInstancia().getUsuario();
         setupGame();
     }
 
@@ -127,7 +144,7 @@ public class JugarController {
             } else {
                 secondsElapsed++;
                 timeLabel.setText("Tiempo: " + secondsElapsed + "s");
-            }
+                this.secondsElapsed=secondsElapsed;            }
         }));
         timer.setCycleCount(Animation.INDEFINITE);
         timer.play();
@@ -193,7 +210,7 @@ public class JugarController {
             shake.setAutoReverse(true);
             shake.play();
         }
-        guardarEstadisticas(true); 
+        guardarEstadisticas(true);
         Text win = new Text(" ¡Ganaste! ");
         win.setFont(Font.font("System", 60));
         win.setFill(Color.YELLOW);
@@ -259,68 +276,74 @@ public class JugarController {
         }
     }
 
-
     private void guardarEstadisticas(boolean victoria) throws SQLException {
-        if (usuarioActual == null || dificultadActual == null) return;
-    
-        UsuarioServiceModel servicio = new UsuarioServiceModel("src\\main\\resources\\usuarios.db");
-    
+        if (usuarioActual == null || dificultadActual == null)
+            return;
+
+        UsuarioServiceModel servicio = new UsuarioServiceModel("src/main/resources/usuarios.db");
+
         try {
-            UsuarioEstadisticasEntity estadisticas = servicio.obtenerEstadisticasPorDificultad(usuarioActual.getEmail(), dificultadActual);
+            UsuarioEstadisticasEntity estadisticas = servicio.obtenerEstadisticasPorDificultad(usuarioActual.getEmail(),
+                    dificultadActual);
             if (estadisticas == null) {
                 estadisticas = new UsuarioEstadisticasEntity();
                 estadisticas.setDificultad(dificultadActual);
             }
-    
+
             if (victoria) {
                 if (contrareloj) {
                     estadisticas.setVictoriasContrareloj(estadisticas.getVictoriasContrareloj() + 1);
                 } else {
                     estadisticas.setVictoriasNormal(estadisticas.getVictoriasNormal() + 1);
                     int tiempoActual = secondsElapsed;
-                    if (estadisticas.getMejorTiempoNormal() == 0 || tiempoActual < estadisticas.getMejorTiempoNormal()) {
-                        estadisticas.setMejorTiempoNormal(tiempoActual);
+                    if (usuarioActual.getMejorTiempoNormal() == 0
+                            || tiempoActual < usuarioActual.getMejorTiempoNormal()) {
+                        usuarioActual.setMejorTiempoNormal(tiempoActual);
                     }
                 }
-    
+
                 usuarioActual.setRachaDerrota(0);
                 usuarioActual.setRachaVictoria(usuarioActual.getRachaVictoria() + 1);
-    
+
             } else {
                 usuarioActual.setDerrotasTotales(usuarioActual.getDerrotasTotales() + 1);
                 usuarioActual.setRachaVictoria(0);
                 usuarioActual.setRachaDerrota(usuarioActual.getRachaDerrota() + 1);
             }
-    
+
             switch (dificultadActual.toLowerCase()) {
-    case "fácil":
-        if (contrareloj) {
-            usuarioActual.setVictoriasContrareloj(usuarioActual.getVictoriasContrareloj() + 1);
-        } else {
-            usuarioActual.setVictoriasFacil(usuarioActual.getVictoriasFacil() + 1);
+                case "facil":
+                    if (contrareloj) {
+                        usuarioActual.setVictoriasContrareloj(usuarioActual.getVictoriasContrareloj() + 1);
+                    } else {
+                        usuarioActual.setVictoriasFacil(usuarioActual.getVictoriasFacil() + 1);
+                    }
+                    servicio.actualizarEstadisticas(usuarioActual,dificultadActual);
+
+                    break;
+                case "medio":
+                    if (contrareloj) {
+                        usuarioActual.setVictoriasContrareloj(usuarioActual.getVictoriasContrareloj() + 1);
+                    } else {
+                        usuarioActual.setVictoriasNormal(usuarioActual.getVictoriasNormal() + 1);
+                    }
+                    servicio.actualizarEstadisticas(usuarioActual,dificultadActual);
+
+                    break;
+                case "difícil":
+                    if (contrareloj) {
+                        usuarioActual.setVictoriasContrareloj(usuarioActual.getVictoriasContrareloj() + 1);
+                    } else {
+                        usuarioActual.setVictoriasDificil(usuarioActual.getVictoriasDificil() + 1);
+                    }
+                    servicio.actualizarEstadisticas(usuarioActual,dificultadActual);
+
+                    break;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        break;
-    case "normal":
-        if (contrareloj) {
-            usuarioActual.setVictoriasContrareloj(usuarioActual.getVictoriasContrareloj() + 1);
-        } else {
-            usuarioActual.setVictoriasNormal(usuarioActual.getVictoriasNormal() + 1);
-        }
-        break;
-    case "difícil":
-        if (contrareloj) {
-            usuarioActual.setVictoriasContrareloj(usuarioActual.getVictoriasContrareloj() + 1);
-        } else {
-            usuarioActual.setVictoriasDificil(usuarioActual.getVictoriasDificil() + 1);
-        }
-        break; }}
-       catch (Exception e) {
-        e.printStackTrace();
+
     }
-
-    
-    
-
-
-
-}}
+}
