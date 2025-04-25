@@ -94,7 +94,7 @@ public class UsuarioServiceModel extends Conexion {
                 ResultSet rsEst = psEst.executeQuery();
 
                 if (rsEst.next()) {
-                    usuario.setVictoriasNormal(rsEst.getInt("victorias_normal"));
+                    usuario.setVictoriasMedio(rsEst.getInt("victorias_normal"));
                     usuario.setMejorTiempoNormal(rsEst.getInt("mejor_tiempo_normal"));
                     usuario.setVictoriasContrareloj(rsEst.getInt("victorias_contrareloj"));
                 }
@@ -140,7 +140,6 @@ public class UsuarioServiceModel extends Conexion {
                 conn.rollback();
                 return false;
             }
-            System.out.println("¿Está abierta la conexión? " + !conn.isClosed());
             try {
                 stmtEstadisticas = conn.prepareStatement(sqlEstadisticas);
             } catch (SQLException e) {
@@ -232,7 +231,7 @@ public class UsuarioServiceModel extends Conexion {
 
     public boolean actualizarEstadisticas(UsuarioEntity usuario, String dificultad) throws SQLException {
         String sql = "UPDATE estadisticas_usuario SET  victorias_normal = ? " +
-                     ", mejor_tiempo_normal = ?, victorias_contrareloj = ? WHERE id_usuario = ? and dificultad=?";
+                     ", mejor_tiempo_normal = ?, victorias_contrareloj = ? WHERE id_usuario = ? and dificultad = ?";
         Connection conn = null;
         PreparedStatement stmt = null;
         String sql2="select id from usuario where nombre_usuario='"+usuario.getNombre()+"'";
@@ -255,14 +254,15 @@ public class UsuarioServiceModel extends Conexion {
             stmt.setInt(1, usuario.getVictoriasTotal());
             stmt.setInt(2, usuario.getMejorTiempoNormal());
             stmt.setInt(3, usuario.getVictoriasContrareloj());
-
             stmt.setInt(4, id);
             stmt.setString(5, dificultad);
 
             return stmt.executeUpdate() > 0;
 
         } finally {
-            if (stmt != null) stmt.close();
+            if (stmt != null){
+                stmt.close();
+            } 
             cerrar();
         }
     }

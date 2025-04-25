@@ -9,7 +9,7 @@ public class UsuarioEntity {
     private String contrasenia;
 
     private int victoriasFacil;
-    private int victoriasNormal;
+    private int victoriasMedio;
     private int victoriasDificil;
     private Integer mejorTiempoNormal; 
     private int victoriasContrareloj;
@@ -27,7 +27,7 @@ public class UsuarioEntity {
         this.nombre = nombre;
         this.contrasenia = contrasenia;
         this.victoriasFacil = 0;
-        this.victoriasNormal = 0;
+        this.victoriasMedio = 0;
         this.victoriasDificil = 0;
         this.mejorTiempoNormal = null;
         this.victoriasContrareloj = 0;
@@ -69,12 +69,12 @@ public class UsuarioEntity {
         this.victoriasFacil = victoriasFacil;
     }
 
-    public int getVictoriasNormal() {
-        return this.victoriasNormal;
+    public int getVictoriasMedio() {
+        return this.victoriasMedio;
     }
 
-    public void setVictoriasNormal(int victoriasNormal) {
-        this.victoriasNormal = victoriasNormal;
+    public void setVictoriasMedio(int victoriasMedio) {
+        this.victoriasMedio = victoriasMedio;
     }
 
     public int getVictoriasDificil() {
@@ -148,6 +148,6 @@ public class UsuarioEntity {
     }
 
     public int getVictoriasTotal() {
-        return getVictoriasDificil()+getVictoriasFacil()+getVictoriasNormal();
+        return getVictoriasDificil()+getVictoriasFacil()+getVictoriasMedio();
     }
 }

@@ -37,4 +37,16 @@ public class UsuarioEstadisticasEntity {
     public void setVictoriasContrareloj(int victoriasContrareloj) {
         this.victoriasContrareloj = victoriasContrareloj;
     }
+
+
+    @Override
+    public String toString() {
+        return "{" +
+            " dificultad='" + getDificultad() + "'" +
+            ", victoriasNormal='" + getVictoriasNormal() + "'" +
+            ", mejorTiempoNormal='" + getMejorTiempoNormal() + "'" +
+            ", victoriasContrareloj='" + getVictoriasContrareloj() + "'" +
+            "}";
+    }
+
 }

@@ -63,11 +63,12 @@ public class JugarController {
     }
 
     public void inicializarJuego() {
+
         switch (pairCount) {
             case 4:
                 dificultadActual="facil";
                 break;
-            case 6:
+            case 8:
                 dificultadActual="medio";
                 break;
             case 18:
@@ -159,6 +160,7 @@ public class JugarController {
             return;
 
         clicked.flip();
+
         SoundPlayer.play("flip.mp3", 1, 0);
 
         if (selected1 == null) {
@@ -285,6 +287,7 @@ public class JugarController {
         try {
             UsuarioEstadisticasEntity estadisticas = servicio.obtenerEstadisticasPorDificultad(usuarioActual.getEmail(),
                     dificultadActual);
+                    
             if (estadisticas == null) {
                 estadisticas = new UsuarioEstadisticasEntity();
                 estadisticas.setDificultad(dificultadActual);
@@ -325,7 +328,7 @@ public class JugarController {
                     if (contrareloj) {
                         usuarioActual.setVictoriasContrareloj(usuarioActual.getVictoriasContrareloj() + 1);
                     } else {
-                        usuarioActual.setVictoriasNormal(usuarioActual.getVictoriasNormal() + 1);
+                        usuarioActual.setVictoriasMedio(usuarioActual.getVictoriasMedio() + 1);
                     }
                     servicio.actualizarEstadisticas(usuarioActual,dificultadActual);
 

@@ -2,7 +2,6 @@ package es.ies.puerto.controller;
 
 import es.ies.puerto.PrincipalApplication;
 import es.ies.puerto.controller.abstractas.AbstractController;
-import es.ies.puerto.model.UsuarioServiceModel;
 import es.ies.puerto.model.UsuarioSesion;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
