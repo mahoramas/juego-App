@@ -88,7 +88,6 @@ public class UsuarioServiceModel extends Conexion {
                 int idUsuario = rs.getInt("id");
                 usuario = new UsuarioEntity(rs.getString("email"), rs.getString("nombre_usuario"), rs.getString("contrasenia"));
 
-                // Estadísticas
                 sql = "SELECT * FROM estadisticas_usuario WHERE id_usuario = ? AND dificultad = 'facil'";
                 PreparedStatement psEst = conn.prepareStatement(sql);
                 psEst.setInt(1, idUsuario);
@@ -118,26 +117,54 @@ public class UsuarioServiceModel extends Conexion {
 
     public boolean agregarUsuario(UsuarioEntity usuario) throws SQLException {
         if (usuario == null) return false;
-
-        String sql = "INSERT INTO usuario (nombre_usuario, email, contrasenia) VALUES (?, ?, ?)";
+    
+        String sqlInsertUsuario = "INSERT INTO usuario (nombre_usuario, email, contrasenia) VALUES (?, ?, ?)";
         Connection conn = null;
         PreparedStatement stmt = null;
-
+        PreparedStatement stmtEstadisticas = null;
+        ResultSet generatedKeys = null;
         try {
             conn = getConnection();
-            stmt = conn.prepareStatement(sql);
+            stmt = conn.prepareStatement(sqlInsertUsuario);
             stmt.setString(1, usuario.getNombre());
             stmt.setString(2, usuario.getEmail());
             stmt.setString(3, usuario.getContrasenia());
+            stmt.executeUpdate();
+    
+            int idUsuario = obtenerIdUsuario(usuario.getEmail());
+            conn = getConnection();
 
-            return stmt.executeUpdate() > 0;
-
+            String sqlEstadisticas = "INSERT INTO estadisticas_usuario (id_usuario, dificultad, victorias_normal, mejor_tiempo_normal, victorias_contrareloj) VALUES (?, ?, 0, 0, 0)";
+            generatedKeys = stmt.getGeneratedKeys();
+            if (!generatedKeys.next()) {
+                conn.rollback();
+                return false;
+            }
+            System.out.println("¿Está abierta la conexión? " + !conn.isClosed());
+            try {
+                stmtEstadisticas = conn.prepareStatement(sqlEstadisticas);
+            } catch (SQLException e) {
+                System.err.println("¡Fallo preparando stmtEstadisticas!");
+                e.printStackTrace(); 
+                return false;
+            }
+            for (String dificultad : new String[]{"facil", "medio", "dificil"}) {
+                stmtEstadisticas.setInt(1, idUsuario);
+                stmtEstadisticas.setString(2, dificultad);
+                stmtEstadisticas.executeUpdate();
+            }
+    
+            return true;
+    
         } finally {
-            if (stmt != null) stmt.close();
-            cerrar();
+            if (stmt != null) {
+                stmt.close();
+            }
+                cerrar();
+            
         }
     }
-
+    
     public boolean editarUsuario(UsuarioEntity usuario) throws SQLException {
         if (usuario == null) return false;
 

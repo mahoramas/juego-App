@@ -330,7 +330,7 @@ public class JugarController {
                     servicio.actualizarEstadisticas(usuarioActual,dificultadActual);
 
                     break;
-                case "difícil":
+                case "dificil":
                     if (contrareloj) {
                         usuarioActual.setVictoriasContrareloj(usuarioActual.getVictoriasContrareloj() + 1);
                     } else {

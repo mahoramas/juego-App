@@ -18,7 +18,7 @@ CREATE TABLE estadisticas_usuario (
     dificultad TEXT CHECK(dificultad IN ('facil', 'medio', 'dificil')) NOT NULL,
 
     victorias_normal INTEGER DEFAULT 0,
-    mejor_tiempo_normal INTEGER DEFAULT NULL, -- en segundos
+    mejor_tiempo_normal INTEGER DEFAULT 0, 
     victorias_contrareloj INTEGER DEFAULT 0,
 
     FOREIGN KEY (id_usuario) REFERENCES usuario(id)
@@ -28,7 +28,6 @@ CREATE TABLE estadisticas_usuario (
 CREATE TABLE resumen_usuario (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     id_usuario INTEGER NOT NULL,
-    
     derrotas_totales INTEGER DEFAULT 0,
     mayor_racha INTEGER DEFAULT 0,
     racha_actual INTEGER DEFAULT 0,

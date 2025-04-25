@@ -18,64 +18,43 @@ PasswordField {
     -fx-border-color:black;
 }
 
-/* botones */
-Button{
-    -fx-background-color: #d61a13;
-    -fx-text-fill: white;
-    -fx-font-size: 16px;
-    -fx-padding: 10px;
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
-    -fx-effect: dropshadow(gaussian, rgb(0, 0, 0), 3, 0.8, 0, 0);
+.button {
+    -fx-font-size: 14px;
+    -fx-font-family: "Press Start 2P", monospace;
+    -fx-padding: 8px 16px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-border-color: #3a2c0f;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 3, 0.6, 1, 1);
 }
 
-/* boton cuando el raton esta encima*/
-Button:hover{
-    -fx-background-color: #830b07;
+/* BOTÓN FÁCIL */
+#facilButton {
+    -fx-background-color: #e0c56b;
+    -fx-text-fill: #2e1b00;
+}
+#facilButton:hover {
+    -fx-background-color: #c0a956;
 }
 
-
-#facilButton{
-    -fx-background-color: #2fe976;
-    -fx-text-fill: rgb(0, 0, 0);
-    -fx-font-size: 16px;
-    -fx-padding: 10px;
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
-    -fx-effect: dropshadow(gaussian, rgb(255, 255, 255), 3, 0.8, 0, 0);
+/* BOTÓN NORMAL */
+#normalButton {
+    -fx-background-color: #f6e95c;
+    -fx-text-fill: #2e1b00;
+}
+#normalButton:hover {
+    -fx-background-color: #d7c743;
 }
 
-#facilButton:hover{
-    -fx-background-color: #187c3f;
+/* BOTÓN DIFÍCIL */
+#dificilButton {
+    -fx-background-color: #e47c78;
+    -fx-text-fill: #2e1b00;
 }
-
-#normalButton{
-    -fx-background-color: #f9fd15;
-    -fx-text-fill: rgb(0, 0, 0);
-    -fx-font-size: 16px;
-    -fx-padding: 10px;
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
-    -fx-effect: dropshadow(gaussian, rgb(255, 255, 255), 3, 0.8, 0, 0);
+#dificilButton:hover {
+    -fx-background-color: #c5605d;
 }
-
-#normalButton:hover{
-    -fx-background-color: #a2a50d;
-}
-
-#dificilButton{
-    -fx-background-color: #fd1515;
-    -fx-text-fill: rgb(0, 0, 0);
-    -fx-font-size: 16px;
-    -fx-padding: 10px;
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
-    -fx-effect: dropshadow(gaussian, rgb(255, 255, 255), 3, 0.8, 0, 0);
-}
-#dificilButton:hover{
-    -fx-background-color: #8d0909;
-}
-
 
 /* textos */
 #text{
@@ -102,4 +81,27 @@ VBox {
     -fx-background-insets: 0, 0;
     -fx-background-blend-mode: overlay, multiply;
 }
+
+.check-box {
+    -fx-font-size: 12px;
+    -fx-text-fill: #2e1b00;
+    -fx-font-family: "Press Start 2P", monospace;
+}
+
+.check-box .box {
+    -fx-background-color: #e0c56b;
+    -fx-border-color: #3a2c0f;
+    -fx-border-width: 2px;
+    -fx-border-radius: 2;
+    -fx-padding: 2;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #3a2c0f;
+}
+
+.check-box .mark {
+    -fx-background-color: white;
+}
+
 
