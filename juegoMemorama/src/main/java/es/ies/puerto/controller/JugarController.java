@@ -297,7 +297,6 @@ public class JugarController {
                 if (contrareloj) {
                     estadisticas.setVictoriasContrareloj(estadisticas.getVictoriasContrareloj() + 1);
                 } else {
-                    estadisticas.setVictoriasNormal(estadisticas.getVictoriasNormal() + 1);
                     int tiempoActual = secondsElapsed;
                     if (usuarioActual.getMejorTiempoNormal() == 0
                             || tiempoActual < usuarioActual.getMejorTiempoNormal()) {
