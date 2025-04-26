@@ -141,6 +141,7 @@ public class UsuarioServiceModel extends Conexion {
         Connection conn = null;
         PreparedStatement stmt = null;
         PreparedStatement stmtEstadisticas = null;
+        PreparedStatement stmtResumen = null;
         ResultSet generatedKeys = null;
         try {
             conn = getConnection();
@@ -171,12 +172,23 @@ public class UsuarioServiceModel extends Conexion {
                 stmtEstadisticas.setString(2, dificultad);
                 stmtEstadisticas.executeUpdate();
             }
+
+            String sqlResumen = "INSERT INTO resumen_usuario (id_usuario, derrotas_totales, mayor_racha, racha_actual, derrotas_consecutivas) VALUES (?, 0, 0, 0, 0)";
+            stmtResumen = conn.prepareStatement(sqlResumen);
+            stmtResumen.setInt(1, idUsuario);
+            stmtResumen.executeUpdate();
     
             return true;
     
         } finally {
             if (stmt != null) {
                 stmt.close();
+            }
+            if (stmtEstadisticas != null) {
+                stmtEstadisticas.close();
+            }
+            if (stmtResumen != null) {
+                stmtResumen.close();
             }
                 cerrar();
             
