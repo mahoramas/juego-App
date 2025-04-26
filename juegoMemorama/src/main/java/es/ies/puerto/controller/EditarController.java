@@ -39,7 +39,7 @@ public class EditarController extends AbstractController {
     private Button onEliminarButton;
 
     /**
-     * * Metodo que inicializa el controlador
+     * Metodo que inicializa el controlador
      */
     @FXML
     public void initialize() {
@@ -52,7 +52,7 @@ public class EditarController extends AbstractController {
     }
 
     /**
-     * * Metodo que se ejecuta al hacer click en el boton de guardar
+     * Metodo que se ejecuta al hacer click en el boton de guardar
      * @throws SQLException Excepcion de SQL
      */
     @FXML
@@ -83,8 +83,7 @@ public class EditarController extends AbstractController {
     }
 
     /**
-     * * Metodo que se ejecuta al hacer click en el boton de volver
-     * * @throws SQLException Excepcion de SQL
+     * Metodo que se ejecuta al hacer click en el boton de volver
      */
     @FXML
     protected void openVolverClick() {
@@ -101,8 +100,7 @@ public class EditarController extends AbstractController {
     }
     
     /**
-     * * Metodo que se ejecuta al hacer click en el boton de eliminar
-     * * @throws SQLException Excepcion de SQL
+     * Metodo que se ejecuta al hacer click en el boton de eliminar
      */
     @FXML
     protected void openEliminarClick() {

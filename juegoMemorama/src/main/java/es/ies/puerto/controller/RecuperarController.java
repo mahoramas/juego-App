@@ -21,9 +21,9 @@ public class RecuperarController extends AbstractController {
     @FXML
     private Button onVolverButton;
 
+
     /**
-     * * Metodo que inicializa el controlador
-     * * @throws SQLException Excepcion de SQL
+     * Metodo de recuperacion de cuenta
      */
     @FXML
     protected void onClickRecuperar() {
@@ -44,8 +44,7 @@ public class RecuperarController extends AbstractController {
     }
 
     /**
-     * * Metodo que se ejecuta al hacer click en el boton de volver
-     * * @throws SQLException Excepcion de SQL
+     * Metodo que vuelve a la pantalla de inicio de sesion
      */
     @FXML
     protected void openVolverClick() {

@@ -26,8 +26,7 @@ public class PerfilController {
 
     
     /**
-     * * Metodo que inicializa el controlador
-     * * @throws SQLException Excepcion de SQL
+     * Metodo que inicializa el controlador
      */
     @FXML
     public void initialize() {
@@ -40,8 +39,7 @@ public class PerfilController {
     }
 
     /**
-     * * Metodo que se ejecuta al hacer click en el boton de editar
-     * * @throws SQLException Excepcion de SQL
+     * Metodo que vuelve a la pantalla de inicio de sesion
      */
     @FXML
     protected void openVolverClick() {
@@ -59,8 +57,7 @@ public class PerfilController {
     }
     
     /**
-     * * Metodo que se ejecuta al hacer click en el boton de editar
-     * * @throws SQLException Excepcion de SQL
+     * Metodo que va a la pantalla de editar usuario
      */
     @FXML
     protected void openEditarClick() {

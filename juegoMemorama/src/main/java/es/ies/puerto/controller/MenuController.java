@@ -27,7 +27,11 @@ public class MenuController {
     private Button onVolverButton;
 
 
-
+    /**
+     * Iniciador del contador
+     * @param pairCount numero de pares de cartas de cada dificultad
+     * @param button boton de dificultad que se pulsa
+     */
     private void startGame(int pairCount, Button button) {
         try {
             FXMLLoader loader = new FXMLLoader(PrincipalApplication.class.getResource("jugar.fxml"));
@@ -63,6 +67,9 @@ public class MenuController {
         }
     }
 
+    /**
+     * Metodo para volver a la pantalla de perfil
+     */
     @FXML
     protected void openVolverClick() {
         try {
@@ -77,9 +84,15 @@ public class MenuController {
         }
     }
 
-    @FXML private void startEasy() { startGame(4, playEasy); }
+    @FXML private void startEasy() { 
+        startGame(4, playEasy); 
+    }
 
-    @FXML private void startNormal() { startGame(8, playNormal); }
+    @FXML private void startNormal() { 
+        startGame(8, playNormal); 
+    }
 
-    @FXML private void startHard() { startGame(18, playHard); }
+    @FXML private void startHard() { 
+        startGame(18, playHard); 
+    }
 }

@@ -6,6 +6,8 @@ public class UsuarioEstadisticasEntity {
     private int mejorTiempoNormal;
     private int victoriasContrareloj;
 
+    // Getters y setters
+
     public String getDificultad() {
         return dificultad;
     }
@@ -39,6 +41,10 @@ public class UsuarioEstadisticasEntity {
     }
 
 
+    /**
+     * Metodo toString
+     */
+    
     @Override
     public String toString() {
         return "{" +

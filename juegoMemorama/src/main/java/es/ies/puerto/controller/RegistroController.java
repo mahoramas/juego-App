@@ -37,7 +37,7 @@ public class RegistroController extends AbstractController {
     private Button onVolverButton;
     
     /**
-     * * Metodo que inicializa el controlador
+     * Metodo que inicializa el controlador
      */
     @FXML
     public void initialize() {
@@ -46,8 +46,7 @@ public class RegistroController extends AbstractController {
     }
 
     /**
-     * * Metodo que se ejecuta al hacer click en el boton de registrar
-     * * Registra un nuevo usuario en la base de datos
+     * Metodo que registra un nuevo usuario en la base de datos
      * @throws SQLException Excepcion de SQL
      */
     @FXML
@@ -77,8 +76,7 @@ public class RegistroController extends AbstractController {
     }
 
     /**
-     * * Metodo que se ejecuta al hacer click en el boton de volver
-     * * Vuelve a la pantalla de inicio de sesion
+     * Metodo que vuelve a la pantalla de inicio de sesion
      */
     @FXML
     protected void openVolverClick() {

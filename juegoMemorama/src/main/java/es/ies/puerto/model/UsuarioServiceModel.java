@@ -8,19 +8,39 @@ import java.util.ArrayList;
 
 import es.ies.puerto.model.abtrastas.Conexion;
 
-public class UsuarioServiceModel extends Conexion {
+public class UsuarioServiceModel extends Conexion  {
 
-    public UsuarioServiceModel() {}
+    /**
+     * Constructor vacio
+     */
+    public UsuarioServiceModel() {
+    }
 
+    /**
+     * Constructor con la ruta de la base de datos
+     * @param unaRutaArchivoBD path de la base de datos
+     * @throws SQLException
+     */
     public UsuarioServiceModel(String unaRutaArchivoBD) throws SQLException {
         super(unaRutaArchivoBD);
     }
 
+    /**
+     * Metodo para obtener a un usuario
+     * @return un usuario
+     * @throws SQLException
+     */
     public ArrayList<UsuarioEntity> obtenerUsuarios() throws SQLException {
         String sql = "SELECT * FROM Usuario";
         return obtenerUsuario(sql);
     }
 
+    /**
+     * Metodo para obtener una lista de usuarios
+     * @param sql consulta de la base de datos
+     * @return una lista de usuarios
+     * @throws SQLException
+     */
     public ArrayList<UsuarioEntity> obtenerUsuario(String sql) throws SQLException {
         ArrayList<UsuarioEntity> usuarios = new ArrayList<>();
         Connection conn = null;
@@ -36,18 +56,25 @@ public class UsuarioServiceModel extends Conexion {
                 usuarios.add(new UsuarioEntity(
                         rs.getString("email"),
                         rs.getString("nombre_usuario"),
-                        rs.getString("contrasenia")
-                ));
+                        rs.getString("contrasenia")));
             }
         } finally {
-            if (rs != null) rs.close();
-            if (stmt != null) stmt.close();
+            if (rs != null)
+                rs.close();
+            if (stmt != null)
+                stmt.close();
             cerrar();
         }
 
         return usuarios;
     }
 
+    /**
+     * Metodo para obtener el id de un usuario
+     * @param dato usuario del que queremos el id
+     * @return
+     * @throws SQLException
+     */
     public int obtenerIdUsuario(String dato) throws SQLException {
         String sql = "SELECT id FROM usuario WHERE email = ? OR nombre_usuario = ?";
         Connection conn = null;
@@ -61,17 +88,21 @@ public class UsuarioServiceModel extends Conexion {
             stmt.setString(2, dato);
             rs = stmt.executeQuery();
 
-            if (rs.next()) return rs.getInt("id");
+            if (rs.next())
+                return rs.getInt("id");
 
-        } finally {
-            if (rs != null) rs.close();
-            if (stmt != null) stmt.close();
-            cerrar();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
         return -1;
     }
 
+    /**
+     * Metodo para obtener todos los datos de un usuario
+     * @param nombreOEmail nombre o email del usuario
+     * @return un usuario
+     */
     public UsuarioEntity obtenerCredencialesUsuario(String nombreOEmail) {
         UsuarioEntity usuario = null;
         Connection conn = null;
@@ -86,9 +117,16 @@ public class UsuarioServiceModel extends Conexion {
     
             if (rs.next()) {
                 int idUsuario = rs.getInt("id");
-                usuario = new UsuarioEntity(rs.getString("email"), rs.getString("nombre_usuario"), rs.getString("contrasenia"));
+                usuario = new UsuarioEntity(
+                    rs.getString("email"),
+                    rs.getString("nombre_usuario"),
+                    rs.getString("contrasenia")
+                );
     
-                String[] dificultades = {"facil", "medio", "dificil"};
+                int mejorTiempoGeneral = 0;
+                int victoriasContrarrelojTotal = 0;
+    
+                String[] dificultades = { "facil", "medio", "dificil" };
                 for (String dificultad : dificultades) {
                     String sqlEst = "SELECT * FROM estadisticas_usuario WHERE id_usuario = ? AND dificultad = ?";
                     PreparedStatement psEst = conn.prepareStatement(sqlEst);
@@ -98,6 +136,8 @@ public class UsuarioServiceModel extends Conexion {
     
                     if (rsEst.next()) {
                         int victorias = rsEst.getInt("victorias_normal");
+                        int mejorTiempo = rsEst.getInt("mejor_tiempo_normal");
+                        int victoriasContrarreloj = rsEst.getInt("victorias_contrareloj");
     
                         switch (dificultad) {
                             case "facil":
@@ -110,15 +150,35 @@ public class UsuarioServiceModel extends Conexion {
                                 usuario.setVictoriasDificil(victorias);
                                 break;
                         }
-                        if ("facil".equals(dificultad)) {
-                            usuario.setMejorTiempoNormal(rsEst.getInt("mejor_tiempo_normal"));
-                            usuario.setVictoriasContrareloj(rsEst.getInt("victorias_contrareloj"));
+    
+                        if (mejorTiempoGeneral == 0 || (mejorTiempo > 0 && mejorTiempo < mejorTiempoGeneral)) {
+                            mejorTiempoGeneral = mejorTiempo;
                         }
+    
+                        victoriasContrarrelojTotal += victoriasContrarreloj;
                     }
     
                     rsEst.close();
                     psEst.close();
                 }
+    
+                usuario.setMejorTiempoNormal(mejorTiempoGeneral);
+                usuario.setVictoriasContrareloj(victoriasContrarrelojTotal);
+    
+                String sqlResumen = "SELECT * FROM resumen_usuario WHERE id_usuario = ?";
+                PreparedStatement psResumen = conn.prepareStatement(sqlResumen);
+                psResumen.setInt(1, idUsuario);
+                ResultSet rsResumen = psResumen.executeQuery();
+    
+                if (rsResumen.next()) {
+                    usuario.setDerrotasTotales(rsResumen.getInt("derrotas_totales"));
+                    usuario.setMayorRacha(rsResumen.getInt("mayor_racha"));
+                    usuario.setRachaVictoria(rsResumen.getInt("racha_actual"));
+                    usuario.setRachaDerrota(rsResumen.getInt("derrotas_consecutivas"));
+                }
+    
+                rsResumen.close();
+                psResumen.close();
             }
     
             rs.close();
@@ -127,22 +187,32 @@ public class UsuarioServiceModel extends Conexion {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            try { cerrar(); } catch (SQLException e) { e.printStackTrace(); }
+            try {
+                cerrar();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     
         return usuario;
     }
     
-
-    public boolean agregarUsuario(UsuarioEntity usuario) throws SQLException {
-        if (usuario == null) return false;
     
+    /**
+     * Metodo que agrega un usuario a la base de datos
+     * @param usuario usuario al que queremos agregar
+     * @return true o false de la insercion
+     * @throws SQLException
+     */
+    public boolean agregarUsuario(UsuarioEntity usuario) throws SQLException {
+        if (usuario == null)
+            return false;
+
         String sqlInsertUsuario = "INSERT INTO usuario (nombre_usuario, email, contrasenia) VALUES (?, ?, ?)";
         Connection conn = null;
         PreparedStatement stmt = null;
         PreparedStatement stmtEstadisticas = null;
         PreparedStatement stmtResumen = null;
-        ResultSet generatedKeys = null;
         try {
             conn = getConnection();
             stmt = conn.prepareStatement(sqlInsertUsuario);
@@ -150,24 +220,19 @@ public class UsuarioServiceModel extends Conexion {
             stmt.setString(2, usuario.getEmail());
             stmt.setString(3, usuario.getContrasenia());
             stmt.executeUpdate();
-    
+
             int idUsuario = obtenerIdUsuario(usuario.getEmail());
-            conn = getConnection();
 
             String sqlEstadisticas = "INSERT INTO estadisticas_usuario (id_usuario, dificultad, victorias_normal, mejor_tiempo_normal, victorias_contrareloj) VALUES (?, ?, 0, 0, 0)";
-            generatedKeys = stmt.getGeneratedKeys();
-            if (!generatedKeys.next()) {
-                conn.rollback();
-                return false;
-            }
+
             try {
                 stmtEstadisticas = conn.prepareStatement(sqlEstadisticas);
             } catch (SQLException e) {
                 System.err.println("¡Fallo preparando stmtEstadisticas!");
-                e.printStackTrace(); 
+                e.printStackTrace();
                 return false;
             }
-            for (String dificultad : new String[]{"facil", "medio", "dificil"}) {
+            for (String dificultad : new String[] { "facil", "medio", "dificil" }) {
                 stmtEstadisticas.setInt(1, idUsuario);
                 stmtEstadisticas.setString(2, dificultad);
                 stmtEstadisticas.executeUpdate();
@@ -177,9 +242,9 @@ public class UsuarioServiceModel extends Conexion {
             stmtResumen = conn.prepareStatement(sqlResumen);
             stmtResumen.setInt(1, idUsuario);
             stmtResumen.executeUpdate();
-    
+
             return true;
-    
+
         } finally {
             if (stmt != null) {
                 stmt.close();
@@ -190,35 +255,21 @@ public class UsuarioServiceModel extends Conexion {
             if (stmtResumen != null) {
                 stmtResumen.close();
             }
-                cerrar();
-            
-        }
-    }
-    
-    public boolean editarUsuario(UsuarioEntity usuario) throws SQLException {
-        if (usuario == null) return false;
-
-        String sql = "UPDATE usuario SET nombre_usuario = ?, email = ?, contrasenia = ?";
-        Connection conn = null;
-        PreparedStatement stmt = null;
-
-        try {
-            conn = getConnection();
-            stmt = conn.prepareStatement(sql);
-            stmt.setString(1, usuario.getNombre());
-            stmt.setString(2, usuario.getEmail());
-            stmt.setString(3, usuario.getContrasenia());
-
-            return stmt.executeUpdate() > 0;
-
-        } finally {
-            if (stmt != null) stmt.close();
             cerrar();
+
         }
     }
 
+    /**
+     * Metodo para editar los valores de un usuario
+     * @param usuario usuario al que queremos editar
+     * @param emailOriginal email del usuario
+     * @return true o false de la edicion
+     * @throws SQLException
+     */
     public boolean editarUsuario(UsuarioEntity usuario, String emailOriginal) throws SQLException {
-        if (usuario == null || emailOriginal == null || emailOriginal.isEmpty()) return false;
+        if (usuario == null || emailOriginal == null || emailOriginal.isEmpty())
+            return false;
 
         String sql = "UPDATE usuario SET nombre_usuario = ?, email = ?, contrasenia = ? WHERE email = ?";
         Connection conn = null;
@@ -235,13 +286,21 @@ public class UsuarioServiceModel extends Conexion {
             return stmt.executeUpdate() > 0;
 
         } finally {
-            if (stmt != null) stmt.close();
+            if (stmt != null)
+                stmt.close();
             cerrar();
         }
     }
 
+    /**
+     * Metodo para eliminar un usuario de la base de datos
+     * @param email email del usuario
+     * @return true o false de la eliminacion
+     * @throws SQLException
+     */
     public boolean eliminarUsuario(String email) throws SQLException {
-        if (email == null || email.isEmpty()) return false;
+        if (email == null || email.isEmpty())
+            return false;
 
         String sql = "DELETE FROM usuario WHERE email = ?";
         Connection conn = null;
@@ -255,28 +314,40 @@ public class UsuarioServiceModel extends Conexion {
             return stmt.executeUpdate() > 0;
 
         } finally {
-            if (stmt != null) stmt.close();
+            if (stmt != null)
+                stmt.close();
             cerrar();
         }
     }
 
+    /**
+     * Metodo que actualiza las estadisticas en la base de datos
+     * @param usuario usuario al que le editamos las estadisticas
+     * @param dificultad dificultad para editar las estadisticas
+     * @return
+     * @throws SQLException
+     */
     public boolean actualizarEstadisticas(UsuarioEntity usuario, String dificultad) throws SQLException {
         String sql = "UPDATE estadisticas_usuario SET  victorias_normal = ? " +
-                     ", mejor_tiempo_normal = ?, victorias_contrareloj = ? WHERE id_usuario = ? and dificultad = ?";
+                ", mejor_tiempo_normal = ?, victorias_contrareloj = ? WHERE id_usuario = ? and dificultad = ?";
         Connection conn = null;
         PreparedStatement stmt = null;
-        String sql2="select id from usuario where nombre_usuario='"+usuario.getNombre()+"'";
-        int id=0;
-        try{
-            conn=getConnection();
-            stmt=conn.prepareStatement(sql2);
+        String sql2 = "SELECT id FROM usuario WHERE nombre_usuario = ?";
+        stmt = conn.prepareStatement(sql2);
+        stmt.setString(1, usuario.getNombre());
+
+        int id = 0;
+        try {
+            conn = getConnection();
+            stmt = conn.prepareStatement(sql2);
             ResultSet rsEst = stmt.executeQuery();
             if (rsEst.next()) {
-                id=rsEst.getInt("id");
+                id = rsEst.getInt("id");
             }
-            
+
         } finally {
-            if (stmt != null) stmt.close();
+            if (stmt != null)
+                stmt.close();
             cerrar();
         }
         try {
@@ -291,16 +362,25 @@ public class UsuarioServiceModel extends Conexion {
             return stmt.executeUpdate() > 0;
 
         } finally {
-            if (stmt != null){
+            if (stmt != null) {
                 stmt.close();
-            } 
+            }
             cerrar();
         }
     }
 
-    public UsuarioEstadisticasEntity obtenerEstadisticasPorDificultad(String dato, String dificultad) throws SQLException {
-        int idUsuario = obtenerIdUsuario(dato);
-        if (idUsuario == -1) return null;
+    /**
+     * Metodo para obtener las estadisticas de un usuario por dificultad
+     * @param usuario usuario del que necesitamos los datos
+     * @param dificultad dificultad de la cual queremos hacer la busqueda
+     * @return las estadisticas del usuario
+     * @throws SQLException
+     */
+    public UsuarioEstadisticasEntity obtenerEstadisticasPorDificultad(String usuario, String dificultad)
+            throws SQLException {
+        int idUsuario = obtenerIdUsuario(usuario);
+        if (idUsuario == -1)
+            return null;
 
         String sql = "SELECT * FROM estadisticas_usuario WHERE id_usuario = ? AND dificultad = ?";
         Connection conn = null;
@@ -323,31 +403,71 @@ public class UsuarioServiceModel extends Conexion {
                 return est;
             }
 
-        } finally {
-            if (rs != null) rs.close();
-            if (stmt != null) stmt.close();
-            cerrar();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
         return null;
     }
 
-    public boolean actualizarEstadisticasPorDificultad(String email, UsuarioEstadisticasEntity est) throws SQLException {
+    /**
+     * metodo para actualizar las estadisticas de un usuario por la dificultad
+     * @param email email del usuario
+     * @param est estadisticas del usuario
+     * @return true o false de la actualizacion
+     * @throws SQLException
+     */
+    public boolean actualizarEstadisticasPorDificultad(String email, UsuarioEstadisticasEntity est)
+            throws SQLException {
         int idUsuario = obtenerIdUsuario(email);
-        if (idUsuario == -1) return false;
-    
+        if (idUsuario == -1)
+            return false;
+
         String sql = "UPDATE estadisticas_usuario SET victorias_normal = ?, mejor_tiempo_normal = ?, victorias_contrareloj = ? WHERE id_usuario = ? AND dificultad = ?";
         try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-    
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setInt(1, est.getVictoriasNormal());
             stmt.setInt(2, est.getMejorTiempoNormal());
             stmt.setInt(3, est.getVictoriasContrareloj());
             stmt.setInt(4, idUsuario);
             stmt.setString(5, est.getDificultad());
-    
+
             return stmt.executeUpdate() > 0;
         }
     }
-    
+
+    /**
+     * Actualiza las estadisticas de la tabla resumen_Usuario
+     * @param email email del usuario
+     * @param usuario usuario al que queremos actualizar
+     * @return true o false de la actualizacion
+     * @throws SQLException
+     */
+    public boolean actualizarResumenUsuario(String email, UsuarioEntity usuario) throws SQLException {
+        int idUsuario = obtenerIdUsuario(email);
+        if (idUsuario == -1)
+            return false;
+
+        String sql = "UPDATE resumen_usuario SET derrotas_totales = ?, mayor_racha = ?, racha_actual = ?, derrotas_consecutivas = ? WHERE id_usuario = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = getConnection();
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, usuario.getDerrotasTotales());
+            stmt.setInt(2, usuario.getMayorRacha());
+            stmt.setInt(3, usuario.getRachaVictoria());
+            stmt.setInt(4, usuario.getRachaDerrota());
+            stmt.setInt(5, idUsuario);
+
+            return stmt.executeUpdate() > 0;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

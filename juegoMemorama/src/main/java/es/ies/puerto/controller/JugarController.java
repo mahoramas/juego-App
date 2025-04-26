@@ -62,6 +62,9 @@ public class JugarController {
         this.dificultadActual = dificultad;
     }
 
+    /**
+     * Metodo que inicializa las variables del juego
+     */
     public void inicializarJuego() {
 
         switch (pairCount) {
@@ -89,6 +92,9 @@ public class JugarController {
         this.contrareloj = contrareloj;
     }
 
+    /**
+     * Metodo que que da comienzo al juego y aleatorizar las cartas
+     */
     private void setupGame() {
         List<String> paths = new ArrayList<>();
         for (char c = 'A'; c < 'A' + pairCount; c++) {
@@ -126,6 +132,9 @@ public class JugarController {
 
     }
 
+    /**
+     * Metodo para que el contador de tiempo y el modo contrarreloj funcione
+     */
     private void startTimer() {
         secondsElapsed = contrareloj ? tiempoLimite : 0;
         timeLabel.setText("Tiempo: " + secondsElapsed + "s");
@@ -151,6 +160,11 @@ public class JugarController {
         timer.play();
     }
 
+    /**
+     * Metodo que realiza la accion cuando hay un evento de click
+     * @param e click del raton
+     * @throws SQLException
+     */
     private void handleClick(MouseEvent e) throws SQLException {
         if (isProcessing)
             return;
@@ -197,10 +211,17 @@ public class JugarController {
         }
     }
 
+    /**
+     * Metodo que actualiza el contador de movimientos
+     */
     private void updateMoveLabel() {
         movesLabel.setText("Movimientos: " + moves);
     }
 
+    /**
+     * Metodo que muestra la animacion de victoria
+     * @throws SQLException
+     */
     private void showWinAnimation() throws SQLException {
         timer.stop();
         SoundPlayer.play("win.mp3", 1, 0);
@@ -226,6 +247,10 @@ public class JugarController {
 
     private boolean isGameOver = false;
 
+    /**
+     * Metodo que muestra la animacion de derrota
+     * @throws SQLException
+     */
     private void handleGameOver() throws SQLException {
         isGameOver = true;
         for (Card c : allCards) {
@@ -267,6 +292,9 @@ public class JugarController {
         wait.play();
     }
 
+    /**
+     * Metodo que devuelve a la pantalla de menu
+     */
     private void returnToMenu() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/es/ies/puerto/menu.fxml"));
@@ -278,46 +306,69 @@ public class JugarController {
         }
     }
 
-    private void guardarEstadisticas(boolean victoria) throws SQLException {
-        if (usuarioActual == null || dificultadActual == null)
+    /**
+     * Metodo principal para guardar las estadisticas
+     * @param victoria valor boleano que indica si la partida esta perdida o ganada
+     */
+    private void guardarEstadisticas(boolean victoria) {
+        if (usuarioActual == null || dificultadActual == null) {
             return;
-
-        UsuarioServiceModel servicio = new UsuarioServiceModel("src/main/resources/usuarios.db");
-
+        }
+    
+        UsuarioServiceModel servicio = null;
+    
         try {
-            UsuarioEstadisticasEntity estadisticas = servicio.obtenerEstadisticasPorDificultad(usuarioActual.getEmail(),
-                    dificultadActual);
-                    
+            servicio = new UsuarioServiceModel("src/main/resources/usuarios.db");
+    
+            UsuarioEstadisticasEntity estadisticas = servicio.obtenerEstadisticasPorDificultad(usuarioActual.getEmail(), dificultadActual);
+    
             if (estadisticas == null) {
                 estadisticas = new UsuarioEstadisticasEntity();
                 estadisticas.setDificultad(dificultadActual);
             }
-
-            if (victoria) {
-                if (contrareloj) {
-                    estadisticas.setVictoriasContrareloj(estadisticas.getVictoriasContrareloj() + 1);
-                } else {
-                    estadisticas.setVictoriasNormal(estadisticas.getVictoriasNormal() +1);
-                    int tiempoActual = secondsElapsed;
-                    if (usuarioActual.getMejorTiempoNormal() == 0
-                            || tiempoActual < usuarioActual.getMejorTiempoNormal()) {
-                        usuarioActual.setMejorTiempoNormal(tiempoActual);
-                    }
-                }
-
-                usuarioActual.setRachaDerrota(0);
-                usuarioActual.setRachaVictoria(usuarioActual.getRachaVictoria() + 1);
-
-            } else {
-                usuarioActual.setDerrotasTotales(usuarioActual.getDerrotasTotales() + 1);
-                usuarioActual.setRachaVictoria(0);
-                usuarioActual.setRachaDerrota(usuarioActual.getRachaDerrota() + 1);
-            }
-
+    
+            comprobarTipoVictoria(victoria, estadisticas);
+    
             servicio.actualizarEstadisticasPorDificultad(usuarioActual.getEmail(), estadisticas);
+            servicio.actualizarResumenUsuario(usuarioActual.getEmail(), usuarioActual);
+    
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (servicio != null) {
+                try {
+                    servicio.cerrar();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-
     }
+
+    /**
+     * Metodo para comprobar de que manera se ha ganado
+     * @param victoria verdadero o falso
+     * @param estadisticas estadisticas del usuario
+     */
+    private void comprobarTipoVictoria(boolean victoria, UsuarioEstadisticasEntity estadisticas){
+        if (victoria) {
+            if (contrareloj) {
+                estadisticas.setVictoriasContrareloj(estadisticas.getVictoriasContrareloj() + 1);
+            } else {
+                estadisticas.setVictoriasNormal(estadisticas.getVictoriasNormal() + 1);
+                int tiempoActual = secondsElapsed;
+                if (estadisticas.getMejorTiempoNormal() == 0 || tiempoActual < estadisticas.getMejorTiempoNormal()) {
+                    estadisticas.setMejorTiempoNormal(tiempoActual); 
+                    usuarioActual.setMejorTiempoNormal(tiempoActual); 
+                }
+            }
+            usuarioActual.setRachaDerrota(0);
+            usuarioActual.setRachaVictoria(usuarioActual.getRachaVictoria() + 1);
+        } else {
+            usuarioActual.setDerrotasTotales(usuarioActual.getDerrotasTotales() + 1);
+            usuarioActual.setRachaVictoria(0);
+            usuarioActual.setRachaDerrota(usuarioActual.getRachaDerrota() + 1);
+        }
+    }
+    
 }

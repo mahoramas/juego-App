@@ -40,8 +40,7 @@ public class LoginController extends AbstractController {
     private Button onMostrarButton;
     
     /**
-     * * Metodo que inicializa el controlador
-     * * @throws SQLException Excepcion de SQL
+     * Metodo que inicializa el controlador
      */
     @FXML
     public void initialize() {
@@ -53,9 +52,7 @@ public class LoginController extends AbstractController {
     }
 
     /**
-     * * Metodo que se ejecuta al hacer click en el boton de idioma
-     * * Cambia el idioma de la aplicacion
-     * * @throws SQLException Excepcion de SQL
+     * Metodo que se ejecuta al hacer click en el boton de idioma
      */
     @FXML
     protected void cambiarIdioma() {
@@ -68,9 +65,7 @@ public class LoginController extends AbstractController {
     }
 
     /**
-     * * Metodo que se ejecuta al hacer click en el boton de login
-     * * Valida las credenciales del usuario
-     * * @throws SQLException Excepcion de SQL
+     * Metodo que se ejecuta al hacer click en el boton de login
      */
     @FXML
     protected void onLoginButtonClick() {
@@ -100,8 +95,7 @@ public class LoginController extends AbstractController {
     }
 
     /**
-     * * Metodo que se ejecuta al hacer click en el boton de volver
-     * * Vuelve a la pantalla de inicio
+     * Metodo que vuelve a la pantalla de inicio
      */
     @FXML
     protected void openRegistrarClick() {
@@ -121,8 +115,7 @@ public class LoginController extends AbstractController {
     }
 
     /**
-     * * Metodo que se ejecuta al hacer click en el boton de recuperar
-     * * Vuelve a la pantalla de recuperacion
+     * Metodo que va a la pantalla de recuperacion
      */
     @FXML
     protected void openRecuperarClick() {
@@ -140,8 +133,7 @@ public class LoginController extends AbstractController {
     }
 
     /**
-     * * Metodo que se ejecuta al hacer click en el boton de mostrar
-     * * Vuelve a la pantalla de mostrar usuarios
+     * Metodo que va a la pantalla de mostrar usuarios
      */
     @FXML
     protected void openMostrarClick() {
@@ -159,8 +151,7 @@ public class LoginController extends AbstractController {
     }
     
     /**
-     * * Metodo que se ejecuta al hacer click en el boton de aceptar
-     * * Valida las credenciales del usuario y abre la pantalla de perfil
+     * Metodo que valida las credenciales del usuario y abre la pantalla de perfil
      */
     @FXML
     protected void openAceptarClick() {

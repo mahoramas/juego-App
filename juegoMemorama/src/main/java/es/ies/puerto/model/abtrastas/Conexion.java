@@ -42,22 +42,17 @@ public abstract class Conexion {
      * @param unaRutaArchivoBD ruta de la bbdd
      * @return conexion a la bbdd
      */
-    public Connection getConnection() {
-        try {
-            if (connection == null) {
-                connection = DriverManager.getConnection("jdbc:sqlite:" + rutaArchivoBD);
-            } 
-        } catch (Exception e) {
-            e.printStackTrace();
+    public Connection getConnection() throws SQLException {
+        if (connection == null || connection.isClosed()) {
+            connection = DriverManager.getConnection("jdbc:sqlite:src/main/resources/usuarios.db");
         }
-        
-        return this.connection;
+        return connection;
     }
 
 
     /**
      * Funcion que abre la conexion a la bbdd
-     * @return
+     * @return la conexion
      * @throws SQLException
      */
     public Connection conectar() throws SQLException {
@@ -72,9 +67,9 @@ public abstract class Conexion {
      * @throws SQLException
      */
     public void cerrar() throws SQLException {
-       if (connection != null || !connection.isClosed()) {
-        connection.close();
-        connection = null;
-       }
-    }
+        if (connection != null && !connection.isClosed()) {
+             connection.close();
+             connection = null;
+        }
+     }
 }

@@ -1,7 +1,5 @@
 package es.ies.puerto.controller;
 
-
-
 import javafx.animation.RotateTransition;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -14,6 +12,11 @@ public class Card extends ImageView {
     private boolean flipped = false;
     private final Image back = new Image(Card.class.getResource("/images/back.png").toString());
 
+
+    /**
+     * Metodo que inizializa la clase Card
+     * @param path ruta de las imagenes
+     */
     public Card(String path) {
         this.imagePath = path;
         setImage(back);
@@ -21,6 +24,9 @@ public class Card extends ImageView {
         setFitHeight(100);
     }
 
+    /**
+     * Metodo que hace que la carta realice una animacion de voltearse
+     */
     public void flip() {
         RotateTransition rt = new RotateTransition(Duration.millis(200), this);
         rt.setAxis(Rotate.Y_AXIS);

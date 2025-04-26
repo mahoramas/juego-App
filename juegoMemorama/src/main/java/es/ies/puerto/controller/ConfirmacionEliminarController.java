@@ -22,8 +22,7 @@ public class ConfirmacionEliminarController extends AbstractController {
     private Text textMensaje;
 
     /**
-     * * Metodo que inicializa el controlador
-     * * @throws SQLException Excepcion de SQL
+     * Metodo para gestionar la pantalla emergente y el click al confirmar la eliminacion de la cuenta
      */
     @FXML
     private void onAceptarClick() {
@@ -62,8 +61,7 @@ public class ConfirmacionEliminarController extends AbstractController {
     }
 
     /**
-     * * Metodo que maneja el evento de cancelar la eliminacion de cuenta
-     * * @param event Evento de click
+     * Metodo que maneja el evento de cancelar la eliminacion de cuenta
      */
     @FXML
     private void onCancelarClick() {

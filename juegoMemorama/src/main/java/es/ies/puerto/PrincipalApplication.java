@@ -11,6 +11,9 @@ import java.io.IOException;
 public class PrincipalApplication extends Application {
     private static Stage currentStage;
 
+    /**
+     * Metodo que ejecuta la aplicacion
+     */
     @Override
     public void start(Stage stage) throws IOException {
         Font.loadFont(getClass().getResourceAsStream("/fonts/PressStart2P-Regular.ttf"), 10);

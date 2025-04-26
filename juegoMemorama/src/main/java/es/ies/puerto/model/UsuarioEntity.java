@@ -16,12 +16,19 @@ public class UsuarioEntity {
     private int derrotasTotales;
     private int rachaVictoria;
     private int rachaDerrota;
+    private int mayorRacha;
 
     // Constructor vacío
     public UsuarioEntity() {
     }
 
-    // Constructor básico
+
+    /**
+     * Metodo con los parametros de registro del usuario
+     * @param email email del usuario
+     * @param nombre nombre del usuario
+     * @param contrasenia contrasenia del usuario
+     */
     public UsuarioEntity(String email, String nombre, String contrasenia) {
         this.email = email;
         this.nombre = nombre;
@@ -32,10 +39,11 @@ public class UsuarioEntity {
         this.mejorTiempoNormal = null;
         this.victoriasContrareloj = 0;
         this.derrotasTotales = 0;
+        this.mayorRacha = 0;
     }
 
-    // Getters y Setters
-    
+
+    // Getters y setters
 
     public String getEmail() {
         return this.email;
@@ -124,29 +132,61 @@ public class UsuarioEntity {
     public void setRachaDerrota(int rachaDerrota) {
         this.rachaDerrota = rachaDerrota;
     }
-    
-    // equals y hashCode basados en el email (clave única)
+
+    public int getMayorRacha() {
+        return this.mayorRacha;
+    }
+
+    public void setMayorRacha(int mayorRacha) {
+        this.mayorRacha = mayorRacha;
+    }
+
+
+    /**
+     * Metodo equals
+     */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof UsuarioEntity)) return false;
-        UsuarioEntity that = (UsuarioEntity) o;
-        return Objects.equals(email, that.email);
+        if (o == this)
+            return true;
+        if (!(o instanceof UsuarioEntity)) {
+            return false;
+        }
+        UsuarioEntity usuarioEntity = (UsuarioEntity) o;
+        return Objects.equals(email, usuarioEntity.email) && Objects.equals(nombre, usuarioEntity.nombre) && Objects.equals(contrasenia, usuarioEntity.contrasenia) && victoriasFacil == usuarioEntity.victoriasFacil && victoriasMedio == usuarioEntity.victoriasMedio && victoriasDificil == usuarioEntity.victoriasDificil && Objects.equals(mejorTiempoNormal, usuarioEntity.mejorTiempoNormal) && victoriasContrareloj == usuarioEntity.victoriasContrareloj && derrotasTotales == usuarioEntity.derrotasTotales && rachaVictoria == usuarioEntity.rachaVictoria && rachaDerrota == usuarioEntity.rachaDerrota && mayorRacha == usuarioEntity.mayorRacha;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(email);
+        return Objects.hash(email, nombre, contrasenia, victoriasFacil, victoriasMedio, victoriasDificil, mejorTiempoNormal, victoriasContrareloj, derrotasTotales, rachaVictoria, rachaDerrota, mayorRacha);
     }
 
-    // toString para debug
+    /**
+     * Metodo toString
+     */
     @Override
     public String toString() {
-        return "email='" + email + '\'' +
-               ", nombre='" + nombre + '\'' +
-               ", contrasenia='" + contrasenia + '\'';
+        return "{" +
+            " email='" + getEmail() + "'" +
+            ", nombre='" + getNombre() + "'" +
+            ", contrasenia='" + getContrasenia() + "'" +
+            ", victoriasFacil='" + getVictoriasFacil() + "'" +
+            ", victoriasMedio='" + getVictoriasMedio() + "'" +
+            ", victoriasDificil='" + getVictoriasDificil() + "'" +
+            ", mejorTiempoNormal='" + getMejorTiempoNormal() + "'" +
+            ", victoriasContrareloj='" + getVictoriasContrareloj() + "'" +
+            ", derrotasTotales='" + getDerrotasTotales() + "'" +
+            ", rachaVictoria='" + getRachaVictoria() + "'" +
+            ", rachaDerrota='" + getRachaDerrota() + "'" +
+            ", mayorRacha='" + getMayorRacha() + "'" +
+            "}";
     }
 
+
+    /**
+     * Obtener el total de victorias
+     * @return el total de victorias
+     */
     public int getVictoriasTotal() {
         return getVictoriasDificil()+getVictoriasFacil()+getVictoriasMedio();
     }

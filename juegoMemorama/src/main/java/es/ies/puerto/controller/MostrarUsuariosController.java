@@ -22,8 +22,7 @@ public class MostrarUsuariosController extends AbstractController {
     private Button onVolverButton;
 
     /**
-     * * Metodo que inicializa el controlador
-     * * @throws SQLException Excepcion de SQL
+     * Metodo que vuelve a la pantalla de inicio de sesion
      */
     @FXML
     protected void openVolverClick() {
@@ -40,9 +39,8 @@ public class MostrarUsuariosController extends AbstractController {
     }
 
     /**
-     * * Metodo que se ejecuta al hacer click en el boton de mostrar
-     * * Muestra todos los usuarios en la base de datos
-     * @throws SQLException Excepcion de SQL
+     * Metodo que muestra todos los usuarios en la base de datos
+     * @throws SQLException
      */
     @FXML
     protected void openMostrarClick() throws SQLException {

@@ -29,6 +29,9 @@ public class EstadisticasController {
     @FXML
     private Button cerrarButton;
 
+    /**
+     * Metodo que inicializa el controlador
+     */
     @FXML
     public void initialize() {
         UsuarioEntity usuario = UsuarioSesion.getInstancia().getUsuario();
@@ -55,6 +58,9 @@ public class EstadisticasController {
     }
     
 
+    /**
+     * Metodo para cerrar la ventana emergente
+     */
     @FXML
     private void onCerrarClick() {
         Stage stage = (Stage) cerrarButton.getScene().getWindow();
