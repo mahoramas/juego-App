@@ -46,7 +46,7 @@ public class EstadisticasController {
             mejorTiempoNormalLabel.setText("Error al cargar estadísticas");
         }
         victoriasFacilLabel.setText("Victorias en fácil: " + usuario.getVictoriasFacil());
-        victoriasNormalLabel.setText("Victorias en normal: " + usuario.getVictoriasMedio());
+        victoriasNormalLabel.setText("Victorias en medio: " + usuario.getVictoriasMedio());
         victoriasDificilLabel.setText("Victorias en difícil: " + usuario.getVictoriasDificil());
         rachaVictoriaLabel.setText("Racha de victorias: " + usuario.getRachaVictoria());
         rachaDerrotaLabel.setText("Racha de derrotas: " + usuario.getRachaDerrota());

@@ -75,7 +75,7 @@ public class UsuarioServiceModel extends Conexion {
     public UsuarioEntity obtenerCredencialesUsuario(String nombreOEmail) {
         UsuarioEntity usuario = null;
         Connection conn = null;
-
+    
         try {
             conn = getConnection();
             String sql = "SELECT * FROM usuario WHERE email = ? OR nombre_usuario = ?";
@@ -83,37 +83,56 @@ public class UsuarioServiceModel extends Conexion {
             ps.setString(1, nombreOEmail);
             ps.setString(2, nombreOEmail);
             ResultSet rs = ps.executeQuery();
-
+    
             if (rs.next()) {
                 int idUsuario = rs.getInt("id");
                 usuario = new UsuarioEntity(rs.getString("email"), rs.getString("nombre_usuario"), rs.getString("contrasenia"));
-
-                sql = "SELECT * FROM estadisticas_usuario WHERE id_usuario = ? AND dificultad = 'facil'";
-                PreparedStatement psEst = conn.prepareStatement(sql);
-                psEst.setInt(1, idUsuario);
-                ResultSet rsEst = psEst.executeQuery();
-
-                if (rsEst.next()) {
-                    usuario.setVictoriasMedio(rsEst.getInt("victorias_normal"));
-                    usuario.setMejorTiempoNormal(rsEst.getInt("mejor_tiempo_normal"));
-                    usuario.setVictoriasContrareloj(rsEst.getInt("victorias_contrareloj"));
+    
+                String[] dificultades = {"facil", "medio", "dificil"};
+                for (String dificultad : dificultades) {
+                    String sqlEst = "SELECT * FROM estadisticas_usuario WHERE id_usuario = ? AND dificultad = ?";
+                    PreparedStatement psEst = conn.prepareStatement(sqlEst);
+                    psEst.setInt(1, idUsuario);
+                    psEst.setString(2, dificultad);
+                    ResultSet rsEst = psEst.executeQuery();
+    
+                    if (rsEst.next()) {
+                        int victorias = rsEst.getInt("victorias_normal");
+    
+                        switch (dificultad) {
+                            case "facil":
+                                usuario.setVictoriasFacil(victorias);
+                                break;
+                            case "medio":
+                                usuario.setVictoriasMedio(victorias);
+                                break;
+                            case "dificil":
+                                usuario.setVictoriasDificil(victorias);
+                                break;
+                        }
+                        if ("facil".equals(dificultad)) {
+                            usuario.setMejorTiempoNormal(rsEst.getInt("mejor_tiempo_normal"));
+                            usuario.setVictoriasContrareloj(rsEst.getInt("victorias_contrareloj"));
+                        }
+                    }
+    
+                    rsEst.close();
+                    psEst.close();
                 }
-
-                rsEst.close();
-                psEst.close();
             }
-
+    
             rs.close();
             ps.close();
-
+    
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             try { cerrar(); } catch (SQLException e) { e.printStackTrace(); }
         }
-
+    
         return usuario;
     }
+    
 
     public boolean agregarUsuario(UsuarioEntity usuario) throws SQLException {
         if (usuario == null) return false;

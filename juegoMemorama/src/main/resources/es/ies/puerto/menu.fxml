@@ -20,7 +20,7 @@
             <Insets top="20.0" />
          </VBox.margin></CheckBox>
         <Button id="facilButton" fx:id="playEasy" onAction="#startEasy" text="Fácil (4 pares)" />
-        <Button id="normalButton" fx:id="playNormal" onAction="#startNormal" text="Normal (8 pares)" />
+        <Button id="normalButton" fx:id="playNormal" onAction="#startNormal" text="Medio (8 pares)" />
         <Button id="dificilButton" fx:id="playHard" onAction="#startHard" text="Difícil (18 pares)" />
       <Button fx:id="onVolverButton" mnemonicParsing="false" onAction="#openVolverClick" text="Volver" />
     </VBox>

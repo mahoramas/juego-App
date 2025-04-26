@@ -297,6 +297,7 @@ public class JugarController {
                 if (contrareloj) {
                     estadisticas.setVictoriasContrareloj(estadisticas.getVictoriasContrareloj() + 1);
                 } else {
+                    estadisticas.setVictoriasNormal(estadisticas.getVictoriasNormal() +1);
                     int tiempoActual = secondsElapsed;
                     if (usuarioActual.getMejorTiempoNormal() == 0
                             || tiempoActual < usuarioActual.getMejorTiempoNormal()) {
@@ -313,36 +314,7 @@ public class JugarController {
                 usuarioActual.setRachaDerrota(usuarioActual.getRachaDerrota() + 1);
             }
 
-            switch (dificultadActual.toLowerCase()) {
-                case "facil":
-                    if (contrareloj) {
-                        usuarioActual.setVictoriasContrareloj(usuarioActual.getVictoriasContrareloj() + 1);
-                    } else {
-                        usuarioActual.setVictoriasFacil(usuarioActual.getVictoriasFacil() + 1);
-                    }
-                    servicio.actualizarEstadisticas(usuarioActual,dificultadActual);
-
-                    break;
-                case "medio":
-                    if (contrareloj) {
-                        usuarioActual.setVictoriasContrareloj(usuarioActual.getVictoriasContrareloj() + 1);
-                    } else {
-                        usuarioActual.setVictoriasMedio(usuarioActual.getVictoriasMedio() + 1);
-                    }
-                    servicio.actualizarEstadisticas(usuarioActual,dificultadActual);
-
-                    break;
-                case "dificil":
-                    if (contrareloj) {
-                        usuarioActual.setVictoriasContrareloj(usuarioActual.getVictoriasContrareloj() + 1);
-                    } else {
-                        usuarioActual.setVictoriasDificil(usuarioActual.getVictoriasDificil() + 1);
-                    }
-                    servicio.actualizarEstadisticas(usuarioActual,dificultadActual);
-
-                    break;
-            }
-
+            servicio.actualizarEstadisticasPorDificultad(usuarioActual.getEmail(), estadisticas);
         } catch (Exception e) {
             e.printStackTrace();
         }
